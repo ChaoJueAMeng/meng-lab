@@ -36,7 +36,9 @@ const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 				document.documentElement.style.colorScheme = theme;
 			})();
 		</script>
-		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+		<link rel="icon" href={withBase('/favicon.ico')} sizes="any" />
+		<link rel="icon" type="image/png" href={withBase('/favicon.png')} sizes="64x64" />
+		<link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
