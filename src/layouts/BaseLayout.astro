@@ -2,6 +2,8 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import AuroraBackground from '../components/AuroraBackground';
+import SiteClickSpark from '../components/SiteClickSpark';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { withBase } from '../lib/paths';
 
@@ -15,21 +17,42 @@ const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light" data-theme-pref="light">
 	<head>
 		<meta charset="utf-8" />
+		<script is:inline>
+			(function () {
+				var KEY = 'meng-lab-theme';
+				var pref = localStorage.getItem(KEY) || 'light';
+				if (pref !== 'light' && pref !== 'dark' && pref !== 'system') pref = 'light';
+				var theme =
+					pref === 'system'
+						? window.matchMedia('(prefers-color-scheme: dark)').matches
+							? 'dark'
+							: 'light'
+						: pref;
+				document.documentElement.dataset.theme = theme;
+				document.documentElement.dataset.themePref = pref;
+				document.documentElement.style.colorScheme = theme;
+			})();
+		</script>
 		<link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
+		<meta name="color-scheme" content="light dark" />
 		<link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href={withBase('/rss.xml')} />
 		<title>{pageTitle}</title>
 	</head>
 	<body>
-		<Header />
-		<main class="wrap">
-			<slot />
-		</main>
-		<Footer />
+		<div class="site-shell">
+			<AuroraBackground client:idle />
+			<SiteClickSpark client:idle />
+			<Header />
+			<main class="wrap">
+				<slot />
+			</main>
+			<Footer />
+		</div>
 	</body>
 </html>

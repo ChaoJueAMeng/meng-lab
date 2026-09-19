@@ -2,6 +2,9 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import NoteList from '../components/NoteList.astro';
 import ProjectList from '../components/ProjectList.astro';
+import HeroHeading from '../components/HeroHeading';
+import HeroKicker from '../components/HeroKicker';
+import ShinyLabel from '../components/ShinyLabel';
 import { getNotes, getProjects } from '../lib/content';
 import { withBase } from '../lib/paths';
 
@@ -11,8 +14,9 @@ const projects = (await getProjects()).slice(0, 3);
 
 <BaseLayout>
 	<section class="hero">
-		<p class="kicker">meng-lab</p>
-		<h1>把能上线的东西写下来。</h1>
+		<HeroKicker client:visible text="meng-lab" />
+		<h1 class="visually-hidden">把能上线的东西写下来。</h1>
+		<HeroHeading client:visible text="把能上线的东西写下来。" />
 		<p class="lede">
 			萌的工程手记。外卖、聊天、Agent、字幕流水线——先跑到公网上，再把踩过的坑记在这里。
 		</p>
@@ -21,7 +25,9 @@ const projects = (await getProjects()).slice(0, 3);
 	<section class="section">
 		<div class="section-head">
 			<h2>最近笔记</h2>
-			<a class="more" href={withBase('/notes')}>全部笔记</a>
+			<a class="more" href={withBase('/notes')}>
+				<ShinyLabel client:visible text="全部笔记" />
+			</a>
 		</div>
 		<NoteList notes={notes} />
 	</section>
@@ -29,7 +35,9 @@ const projects = (await getProjects()).slice(0, 3);
 	<section class="section">
 		<div class="section-head">
 			<h2>作品</h2>
-			<a class="more" href={withBase('/projects')}>全部作品</a>
+			<a class="more" href={withBase('/projects')}>
+				<ShinyLabel client:visible text="全部作品" />
+			</a>
 		</div>
 		<ProjectList projects={projects} />
 	</section>

@@ -1,14 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectList from '../../components/ProjectList.astro';
+import HeroHeading from '../../components/HeroHeading';
+import HeroKicker from '../../components/HeroKicker';
 import { getProjects } from '../../lib/content';
 
 const projects = await getProjects();
 ---
 
 <BaseLayout title="作品" description="打到过公网、或正在打到公网的项目。">
-	<p class="kicker">Projects</p>
-	<h1 class="page-title">作品</h1>
+	<HeroKicker client:visible text="Projects" />
+	<h1 class="visually-hidden">作品</h1>
+	<HeroHeading client:visible className="page-title" text="作品" />
 	<p class="page-desc">能访问、能安装、能翻车的那种。不是作业截图墙。</p>
 	<div class="section">
 		<ProjectList projects={projects} />

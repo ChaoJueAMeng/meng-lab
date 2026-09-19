@@ -2,6 +2,7 @@
 import { formatDate } from '../lib/content';
 import { withBase } from '../lib/paths';
 import type { CollectionEntry } from 'astro:content';
+import NoteCard from './NoteCard';
 
 interface Props {
 	notes: CollectionEntry<'notes'>[];
@@ -13,22 +14,24 @@ const { notes } = Astro.props;
 <ol class="note-list">
 	{
 		notes.map((note) => (
-			<li class="note-item">
-				<time class="note-date" datetime={note.data.pubDate.toISOString()}>
-					{formatDate(note.data.pubDate)}
-				</time>
-				<div>
-					<a href={withBase(`/notes/${note.id}`)}>{note.data.title}</a>
-					{
-						note.data.tags.length > 0 && (
-							<div class="tags">
-								{note.data.tags.map((tag) => (
-									<span class="tag">{tag}</span>
-								))}
-							</div>
-						)
-					}
-				</div>
+			<li>
+				<NoteCard client:visible>
+					<div class="note-item">
+						<time class="note-date" datetime={note.data.pubDate.toISOString()}>
+							{formatDate(note.data.pubDate)}
+						</time>
+						<div>
+							<a href={withBase(`/notes/${note.id}`)}>{note.data.title}</a>
+							{note.data.tags.length > 0 && (
+								<div class="tags">
+									{note.data.tags.map((tag) => (
+										<span class="tag">{tag}</span>
+									))}
+								</div>
+							)}
+						</div>
+					</div>
+				</NoteCard>
 			</li>
 		))
 	}

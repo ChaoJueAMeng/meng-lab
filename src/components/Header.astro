@@ -1,5 +1,7 @@
 ---
 import { stripBase, withBase } from '../lib/paths';
+import BrandMagnet from './BrandMagnet';
+import ThemeToggle from './ThemeToggle';
 
 const path = stripBase(Astro.url.pathname);
 
@@ -11,14 +13,19 @@ function current(href: string) {
 
 <header class="site-header">
 	<div class="wrap">
-		<a class="brand" href={withBase('/')}>
-			<span class="brand-mark">萌</span>
-			萌实验室
-		</a>
-		<nav class="nav" aria-label="主导航">
-			<a href={withBase('/notes')} aria-current={current('/notes') ? 'page' : undefined}>笔记</a>
-			<a href={withBase('/projects')} aria-current={current('/projects') ? 'page' : undefined}>作品</a>
-			<a href={withBase('/about')} aria-current={current('/about') ? 'page' : undefined}>关于</a>
-		</nav>
+		<BrandMagnet client:idle>
+			<a class="brand" href={withBase('/')}>
+				<span class="brand-mark">萌</span>
+				萌实验室
+			</a>
+		</BrandMagnet>
+		<div class="header-end">
+			<nav class="nav" aria-label="主导航">
+				<a href={withBase('/notes')} aria-current={current('/notes') ? 'page' : undefined}>笔记</a>
+				<a href={withBase('/projects')} aria-current={current('/projects') ? 'page' : undefined}>作品</a>
+				<a href={withBase('/about')} aria-current={current('/about') ? 'page' : undefined}>关于</a>
+			</nav>
+			<ThemeToggle client:load />
+		</div>
 	</div>
 </header>

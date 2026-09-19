@@ -1,14 +1,17 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NoteList from '../../components/NoteList.astro';
+import HeroHeading from '../../components/HeroHeading';
+import HeroKicker from '../../components/HeroKicker';
 import { getNotes } from '../../lib/content';
 
 const notes = await getNotes();
 ---
 
 <BaseLayout title="笔记" description="上线实录、Cloudflare、Agent 和全栈踩坑。">
-	<p class="kicker">Notes</p>
-	<h1 class="page-title">笔记</h1>
+	<HeroKicker client:visible text="Notes" />
+	<h1 class="visually-hidden">笔记</h1>
+	<HeroHeading client:visible className="page-title" text="笔记" />
 	<p class="page-desc">不写教程腔。只记自己打到公网时真正翻过的车。</p>
 	<div class="section">
 		<NoteList notes={notes} />

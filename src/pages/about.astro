@@ -1,12 +1,15 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroHeading from '../components/HeroHeading';
+import HeroKicker from '../components/HeroKicker';
 import { GITHUB_URL } from '../consts';
 import { withBase } from '../lib/paths';
 ---
 
 <BaseLayout title="关于" description="萌，在做能跑上线的东西。">
-	<p class="kicker">About</p>
-	<h1 class="page-title">关于</h1>
+	<HeroKicker client:visible text="About" />
+	<h1 class="visually-hidden">关于</h1>
+	<HeroHeading client:visible className="page-title" text="关于" />
 	<div class="about">
 		<p>
 			我是萌，GitHub 上是 <a href={GITHUB_URL}>ChaoJueAMeng</a>。

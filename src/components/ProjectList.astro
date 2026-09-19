@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import ProjectCard from './ProjectCard';
 
 interface Props {
 	projects: CollectionEntry<'projects'>[];
@@ -11,21 +12,25 @@ const { projects } = Astro.props;
 <ol class="project-list">
 	{
 		projects.map((project) => (
-			<li class="project-item">
-				<h3>
-					{project.data.href ? (
-						<a href={project.data.href}>{project.data.title}</a>
-					) : (
-						project.data.title
-					)}
-					<span class="project-status">{project.data.status}</span>
-				</h3>
-				<p>{project.data.summary}</p>
-				<div class="tags">
-					{project.data.stack.map((item) => (
-						<span class="chip">{item}</span>
-					))}
-				</div>
+			<li>
+				<ProjectCard client:visible>
+					<div class="project-item">
+						<h3>
+							{project.data.href ? (
+								<a href={project.data.href}>{project.data.title}</a>
+							) : (
+								project.data.title
+							)}
+							<span class="project-status">{project.data.status}</span>
+						</h3>
+						<p>{project.data.summary}</p>
+						<div class="tags">
+							{project.data.stack.map((item) => (
+								<span class="chip">{item}</span>
+							))}
+						</div>
+					</div>
+				</ProjectCard>
 			</li>
 		))
 	}

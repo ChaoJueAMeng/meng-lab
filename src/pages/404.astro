@@ -1,10 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroHeading from '../components/HeroHeading';
+import HeroKicker from '../components/HeroKicker';
 import { withBase } from '../lib/paths';
 ---
 
 <BaseLayout title="没有这一页" description="要找的页面不在。">
-	<p class="kicker">404</p>
-	<h1 class="page-title">没有这一页。</h1>
+	<HeroKicker client:visible text="404" />
+	<h1 class="visually-hidden">没有这一页。</h1>
+	<HeroHeading client:visible className="page-title" text="没有这一页。" />
 	<p class="page-desc">地址写错了，或者我还没写。回 <a href={withBase('/')}>首页</a> 或去看 <a href={withBase('/notes')}>笔记</a>。</p>
 </BaseLayout>
