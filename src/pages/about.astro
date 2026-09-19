@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { GITHUB_URL } from '../consts';
+import { withBase } from '../lib/paths';
 ---
 
 <BaseLayout title="关于" description="萌，在做能跑上线的东西。">
@@ -19,7 +20,7 @@ import { GITHUB_URL } from '../consts';
 			根域名给业务占着，这个站以后会走 <code>notes.cjameng.top</code> 或 <code>lab.cjameng.top</code>。
 		</p>
 		<p>
-			订阅用 <a href="/rss.xml">RSS</a>。源码在 <a href="https://github.com/ChaoJueAMeng/meng-lab">meng-lab</a>。
+			订阅用 <a href={withBase('/rss.xml')}>RSS</a>。源码在 <a href="https://github.com/ChaoJueAMeng/meng-lab">meng-lab</a>。
 		</p>
 	</div>
 </BaseLayout>

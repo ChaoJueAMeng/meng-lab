@@ -1,6 +1,7 @@
 import rss from '@astrojs/rss';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 import { getNotes } from '../lib/content';
+import { withBase } from '../lib/paths';
 import type { APIContext } from 'astro';
 
 export async function GET(context: APIContext) {
@@ -8,12 +9,12 @@ export async function GET(context: APIContext) {
 	return rss({
 		title: SITE_TITLE,
 		description: SITE_DESCRIPTION,
-		site: context.site ?? 'https://notes.cjameng.top',
+		site: new URL(import.meta.env.BASE_URL, context.site ?? 'https://notes.cjameng.top').href,
 		items: notes.map((note) => ({
 			title: note.data.title,
 			pubDate: note.data.pubDate,
 			description: note.data.description,
-			link: `/notes/${note.id}/`,
+			link: withBase(`/notes/${note.id}/`),
 		})),
 	});
 }

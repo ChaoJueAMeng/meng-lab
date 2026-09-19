@@ -1,5 +1,7 @@
 ---
-const path = Astro.url.pathname;
+import { stripBase, withBase } from '../lib/paths';
+
+const path = stripBase(Astro.url.pathname);
 
 function current(href: string) {
 	if (href === '/') return path === '/';
@@ -9,14 +11,14 @@ function current(href: string) {
 
 <header class="site-header">
 	<div class="wrap">
-		<a class="brand" href="/">
+		<a class="brand" href={withBase('/')}>
 			<span class="brand-mark">萌</span>
 			萌实验室
 		</a>
 		<nav class="nav" aria-label="主导航">
-			<a href="/notes" aria-current={current('/notes') ? 'page' : undefined}>笔记</a>
-			<a href="/projects" aria-current={current('/projects') ? 'page' : undefined}>作品</a>
-			<a href="/about" aria-current={current('/about') ? 'page' : undefined}>关于</a>
+			<a href={withBase('/notes')} aria-current={current('/notes') ? 'page' : undefined}>笔记</a>
+			<a href={withBase('/projects')} aria-current={current('/projects') ? 'page' : undefined}>作品</a>
+			<a href={withBase('/about')} aria-current={current('/about') ? 'page' : undefined}>关于</a>
 		</nav>
 	</div>
 </header>

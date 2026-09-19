@@ -2,8 +2,11 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
+const githubPages = process.env.GITHUB_PAGES === 'true';
+
 export default defineConfig({
-	site: 'https://notes.cjameng.top',
+	site: githubPages ? 'https://chaojueameng.github.io' : 'https://notes.cjameng.top',
+	base: githubPages ? '/meng-lab' : '/',
 	integrations: [sitemap()],
 	markdown: {
 		shikiConfig: {

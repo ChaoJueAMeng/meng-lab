@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import NoteList from '../components/NoteList.astro';
 import ProjectList from '../components/ProjectList.astro';
 import { getNotes, getProjects } from '../lib/content';
+import { withBase } from '../lib/paths';
 
 const notes = (await getNotes()).slice(0, 3);
 const projects = (await getProjects()).slice(0, 3);
@@ -20,7 +21,7 @@ const projects = (await getProjects()).slice(0, 3);
 	<section class="section">
 		<div class="section-head">
 			<h2>最近笔记</h2>
-			<a class="more" href="/notes">全部笔记</a>
+			<a class="more" href={withBase('/notes')}>全部笔记</a>
 		</div>
 		<NoteList notes={notes} />
 	</section>
@@ -28,7 +29,7 @@ const projects = (await getProjects()).slice(0, 3);
 	<section class="section">
 		<div class="section-head">
 			<h2>作品</h2>
-			<a class="more" href="/projects">全部作品</a>
+			<a class="more" href={withBase('/projects')}>全部作品</a>
 		</div>
 		<ProjectList projects={projects} />
 	</section>
