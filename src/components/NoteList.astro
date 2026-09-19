@@ -1,0 +1,34 @@
+---
+import { formatDate } from '../lib/content';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	notes: CollectionEntry<'notes'>[];
+}
+
+const { notes } = Astro.props;
+---
+
+<ol class="note-list">
+	{
+		notes.map((note) => (
+			<li class="note-item">
+				<time class="note-date" datetime={note.data.pubDate.toISOString()}>
+					{formatDate(note.data.pubDate)}
+				</time>
+				<div>
+					<a href={`/notes/${note.id}`}>{note.data.title}</a>
+					{
+						note.data.tags.length > 0 && (
+							<div class="tags">
+								{note.data.tags.map((tag) => (
+									<span class="tag">{tag}</span>
+								))}
+							</div>
+						)
+					}
+				</div>
+			</li>
+		))
+	}
+</ol>

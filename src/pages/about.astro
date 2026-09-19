@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GITHUB_URL } from '../consts';
+---
+
+<BaseLayout title="关于" description="萌，在做能跑上线的东西。">
+	<p class="kicker">About</p>
+	<h1 class="page-title">关于</h1>
+	<div class="about">
+		<p>
+			我是萌，GitHub 上是 <a href={GITHUB_URL}>ChaoJueAMeng</a>。
+			会把东西打到公网上：外卖挂在自己的域名上，聊天跑在子域名上，Agent 和字幕流水线也是为了真的能用。
+		</p>
+		<p>
+			这个站不是简历，也不是课程笔记合集。首页、笔记、作品三块平级——文章写踩坑，作品写已经发生过的事。
+		</p>
+		<p>
+			技术栈不洁癖。Java / Spring、uni-app、Cloudflare Workers、偶尔 Next.js，哪个能把问题送上线就用哪个。
+			根域名给业务占着，这个站以后会走 <code>notes.cjameng.top</code> 或 <code>lab.cjameng.top</code>。
+		</p>
+		<p>
+			订阅用 <a href="/rss.xml">RSS</a>。源码在 <a href="https://github.com/ChaoJueAMeng/meng-lab">meng-lab</a>。
+		</p>
+	</div>
+</BaseLayout>

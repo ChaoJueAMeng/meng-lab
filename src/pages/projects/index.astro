@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectList from '../../components/ProjectList.astro';
+import { getProjects } from '../../lib/content';
+
+const projects = await getProjects();
+---
+
+<BaseLayout title="作品" description="打到过公网、或正在打到公网的项目。">
+	<p class="kicker">Projects</p>
+	<h1 class="page-title">作品</h1>
+	<p class="page-desc">能访问、能安装、能翻车的那种。不是作业截图墙。</p>
+	<div class="section">
+		<ProjectList projects={projects} />
+	</div>
+</BaseLayout>

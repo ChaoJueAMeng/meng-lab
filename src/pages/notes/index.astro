@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import NoteList from '../../components/NoteList.astro';
+import { getNotes } from '../../lib/content';
+
+const notes = await getNotes();
+---
+
+<BaseLayout title="笔记" description="上线实录、Cloudflare、Agent 和全栈踩坑。">
+	<p class="kicker">Notes</p>
+	<h1 class="page-title">笔记</h1>
+	<p class="page-desc">不写教程腔。只记自己打到公网时真正翻过的车。</p>
+	<div class="section">
+		<NoteList notes={notes} />
+	</div>
+</BaseLayout>
