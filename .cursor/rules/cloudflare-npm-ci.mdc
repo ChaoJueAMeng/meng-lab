@@ -1,0 +1,31 @@
+---
+description: 保持 package-lock.json 与 Cloudflare npm ci 兼容，禁止用 npm 11 改写 lockfile
+alwaysApply: true
+---
+
+# Cloudflare npm ci
+
+Cloudflare Workers Builds 在 Linux 上用 **npm 10.9.2** 跑 `npm ci`。本机是 Windows + **npm 11**。npm 11 会从 lockfile 里删掉 `node_modules/@emnapi/core` 和 `node_modules/@emnapi/runtime`，但 `package.json` 的 `optionalDependencies` 仍声明它们，于是线上 `npm ci` 报 `EUSAGE` / Missing from lock file。
+
+## 必须遵守
+
+- 不要用本机 `npm install` / `npm 11` 重写 `package-lock.json`
+- 需要更新 lockfile 时只用：`npx --yes npm@10.9.2 install`
+- 无关提交不要顺手 stage `package-lock.json`
+- 改完 lockfile 后确认这两段还在：
+
+```text
+"node_modules/@emnapi/core"
+"node_modules/@emnapi/runtime"
+```
+
+版本必须是 `1.11.3`，且与 `package.json` 的 `optionalDependencies` 一致。
+
+## 反例 / 正例
+
+```text
+❌ BAD  npm install
+❌ BAD  把 Windows npm 11 生成的 package-lock.json 一并提交
+✅ GOOD npx --yes npm@10.9.2 install
+✅ GOOD 提交前 grep lockfile 里的 @emnapi/core 与 @emnapi/runtime
+```

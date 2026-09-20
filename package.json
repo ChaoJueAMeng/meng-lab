@@ -3,8 +3,10 @@
   "type": "module",
   "version": "0.0.1",
   "description": "萌实验室：萌的工程手记",
+  "packageManager": "npm@10.9.2",
   "engines": {
-    "node": ">=22.12.0"
+    "node": ">=22.12.0",
+    "npm": "10.x"
   },
   "scripts": {
     "dev": "astro dev",
