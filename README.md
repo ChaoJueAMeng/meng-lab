@@ -4,5 +4,7 @@
 
 线上地址：
 
-- [GitHub Pages](https://chaojueameng.github.io/meng-lab/)
+- [GitHub Pages](https://chaojueameng.github.io/)
 - [Cloudflare Workers](https://i.love-u.workers.dev/)
+
+GitHub 用户页由 [ChaoJueAMeng.github.io](https://github.com/ChaoJueAMeng/ChaoJueAMeng.github.io) 发布到根路径，不再使用 `/meng-lab/` 子路径。

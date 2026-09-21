@@ -7,7 +7,7 @@ const githubPages = process.env.GITHUB_PAGES === 'true';
 
 export default defineConfig({
 	site: githubPages ? 'https://chaojueameng.github.io' : 'https://notes.cjameng.top',
-	base: githubPages ? '/meng-lab' : '/',
+	base: '/',
 	integrations: [sitemap(), react()],
 	markdown: {
 		shikiConfig: {
