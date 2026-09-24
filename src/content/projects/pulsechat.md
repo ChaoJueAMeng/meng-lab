@@ -6,6 +6,6 @@ stack:
   - Spring Boot
   - uni-app
 status: 已上线
-href: https://pulse.cjameng.top
+href: https://github.com/ChaoJueAMeng/PulseChat-App/releases
 order: 1
 ---
