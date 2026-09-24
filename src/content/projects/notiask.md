@@ -6,5 +6,5 @@ stack:
   - Android
 status: 公开仓库
 href: https://github.com/ChaoJueAMeng/NotiAsk
-order: 3
+order: 2
 ---

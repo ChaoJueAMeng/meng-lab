@@ -6,7 +6,7 @@ stack:
   - Whisper
   - ASS
 status: 自用工具
-order: 6
+order: 7
 ---
 
 自用流水线：长音频切片、转录、译成带阴影的中文 ASS。

@@ -9,7 +9,7 @@ import { getNotes, getProjects } from '../lib/content';
 import { withBase } from '../lib/paths';
 
 const notes = (await getNotes()).slice(0, 3);
-const projects = (await getProjects()).slice(0, 3);
+const projects = (await getProjects()).slice(0, 4);
 ---
 
 <BaseLayout>
@@ -24,21 +24,21 @@ const projects = (await getProjects()).slice(0, 3);
 
 	<section class="section">
 		<div class="section-head">
-			<h2>最近笔记</h2>
-			<a class="more" href={withBase('/notes')}>
-				<ShinyLabel client:visible text="全部笔记" />
-			</a>
-		</div>
-		<NoteList notes={notes} />
-	</section>
-
-	<section class="section">
-		<div class="section-head">
 			<h2>作品</h2>
 			<a class="more" href={withBase('/projects')}>
 				<ShinyLabel client:visible text="全部作品" />
 			</a>
 		</div>
 		<ProjectList projects={projects} />
+	</section>
+
+	<section class="section">
+		<div class="section-head">
+			<h2>最近笔记</h2>
+			<a class="more" href={withBase('/notes')}>
+				<ShinyLabel client:visible text="全部笔记" />
+			</a>
+		</div>
+		<NoteList notes={notes} />
 	</section>
 </BaseLayout>

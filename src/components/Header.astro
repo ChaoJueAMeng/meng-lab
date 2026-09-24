@@ -23,6 +23,7 @@ function current(href: string) {
 		</BrandMagnet>
 		<div class="header-end">
 			<nav class="nav" aria-label="主导航">
+				<a href={withBase('/')} aria-current={current('/') ? 'page' : undefined}>主页</a>
 				<a href={withBase('/notes')} aria-current={current('/notes') ? 'page' : undefined}>笔记</a>
 				<a href={withBase('/projects')} aria-current={current('/projects') ? 'page' : undefined}>作品</a>
 				<a href={withBase('/about')} aria-current={current('/about') ? 'page' : undefined}>关于</a>
