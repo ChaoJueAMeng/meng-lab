@@ -13,7 +13,7 @@ const projects = await getProjects();
 	<h1 class="visually-hidden">作品</h1>
 	<HeroHeading client:visible className="page-title" text="作品" />
 	<p class="page-desc">能访问、能安装、能翻车的那种。不是作业截图墙。</p>
-	<div class="section">
+	<div class="section" id="works">
 		<ProjectList projects={projects} />
 	</div>
 </BaseLayout>

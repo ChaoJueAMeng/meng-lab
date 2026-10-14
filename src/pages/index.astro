@@ -22,7 +22,7 @@ const projects = (await getProjects()).slice(0, 5);
 		</p>
 	</section>
 
-	<section class="section">
+	<section class="section" id="works">
 		<div class="section-head">
 			<h2>作品</h2>
 			<a class="more" href={withBase('/projects')}>
@@ -32,7 +32,7 @@ const projects = (await getProjects()).slice(0, 5);
 		<ProjectList projects={projects} />
 	</section>
 
-	<section class="section">
+	<section class="section" id="recent-notes">
 		<div class="section-head">
 			<h2>最近笔记</h2>
 			<a class="more" href={withBase('/notes')}>

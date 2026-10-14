@@ -1,0 +1,90 @@
+---
+import { render } from 'astro:content';
+import SkipTransit from '../../../components/demo/SkipTransit';
+import CangqiongDemo from '../../../components/demo/CangqiongDemo';
+import MHarnessDemo from '../../../components/demo/MHarnessDemo';
+import MengMeterDemo from '../../../components/demo/MengMeterDemo';
+import NotiAskDemo from '../../../components/demo/NotiAskDemo';
+import PulseChatDemo from '../../../components/demo/PulseChatDemo';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getProjects } from '../../../lib/content';
+import { withBase } from '../../../lib/paths';
+
+export async function getStaticPaths() {
+	const projects = await getProjects();
+	return projects.map((project) => ({
+		params: { id: project.id },
+		props: { project },
+	}));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const href = project.data.href;
+const demo = project.data.demo;
+const back = withBase('/projects');
+---
+
+<BaseLayout
+	title={`${project.data.title} · 体验`}
+	description={`本地模拟 ${project.data.title}。${project.data.summary}`}
+	noindex
+>
+	<article class="transit">
+		<p class="kicker">体验</p>
+		<h1 class="page-title">
+			{project.data.title}
+			<span class="project-status">{project.data.status}</span>
+		</h1>
+		<p class="page-desc">{project.data.summary}</p>
+		{
+			demo === 'none' ? (
+				<p class="demo-disclaimer">这个作品没有公开演示。下面是说明，不会跳到外部地址。</p>
+			) : (
+				<p class="demo-disclaimer">这一页是本地模拟，用来感受用法。它不是正在运行的线上服务。</p>
+			)
+		}
+		{
+			href && (
+				<p class="transit-jump">
+					<a href={href} target="_blank" rel="noopener">
+						跳过模拟，直接前往
+					</a>
+				</p>
+			)
+		}
+		{demo === 'notiask' && <NotiAskDemo client:visible />}
+		{demo === 'meng-meter' && <MengMeterDemo client:visible />}
+		{demo === 'pulsechat' && <PulseChatDemo client:visible />}
+		{demo === 'm-harness' && <MHarnessDemo client:visible />}
+		{demo === 'cangqiong' && <CangqiongDemo client:visible />}
+		{
+			demo === 'none' && (
+				<div class="prose">
+					<Content />
+				</div>
+			)
+		}
+		{
+			href ? (
+				<div class="transit-actions">
+					<p class="transit-url">
+						原地址
+						<a href={href} target="_blank" rel="noopener">
+							{href}
+						</a>
+					</p>
+					<a class="transit-cta" href={href} target="_blank" rel="noopener">
+						前往原地址
+					</a>
+					<SkipTransit client:visible id={project.id} href={href} />
+				</div>
+			) : (
+				<p class="transit-missing">这个作品没有公开地址。</p>
+			)
+		}
+		<p>
+			<a class="transit-back" href={back}>返回</a>
+		</p>
+	</article>
+</BaseLayout>

@@ -579,7 +579,8 @@ html[data-theme='dark'] .astro-code span {
 		animation: none !important;
 	}
 
-	.aurora-layer {
+	.aurora-layer,
+	.star-trail {
 		display: none;
 	}
 }

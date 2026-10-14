@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { withBase } from '../lib/paths';
 import ProjectCard from './ProjectCard';
 
 interface Props {
@@ -17,11 +18,14 @@ const { projects } = Astro.props;
 					<div class="project-item">
 						<h3>
 							{project.data.href ? (
-								<a href={project.data.href}>{project.data.title}</a>
+								<a class="stretch-link" href={withBase(`/projects/${project.id}/go`)}>
+									<span class="stretch-label">{project.data.title}</span>
+								</a>
 							) : (
 								project.data.title
 							)}
 							<span class="project-status">{project.data.status}</span>
+							{!project.data.href && <span class="private-badge">私有</span>}
 						</h3>
 						<p>{project.data.summary}</p>
 						<div class="tags">

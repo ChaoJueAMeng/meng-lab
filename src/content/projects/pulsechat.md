@@ -6,6 +6,7 @@ stack:
   - Spring Boot
   - uni-app
 status: 已上线
+demo: pulsechat
 href: https://github.com/ChaoJueAMeng/PulseChat-App/releases
 order: 4
 ---

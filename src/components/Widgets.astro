@@ -1,0 +1,93 @@
+---
+import { GITHUB_URL } from '../consts';
+import { formatDate, getNotes, getProjects } from '../lib/content';
+import { getGithubActivity } from '../lib/github';
+import { withBase } from '../lib/paths';
+import ClockCard from './widgets/ClockCard';
+import NowBuilding from './widgets/NowBuilding';
+
+const notes = await getNotes();
+const projects = await getProjects();
+const latestNotes = notes.slice(0, 3);
+const building = projects.find((project) => project.data.status.includes('实验')) ?? projects[0];
+const activity = await getGithubActivity();
+
+const counts = new Map<string, number>();
+for (const note of notes) {
+	for (const tag of note.data.tags) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+}
+for (const project of projects) {
+	for (const tag of project.data.stack) counts.set(tag, (counts.get(tag) ?? 0) + 1);
+}
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
+const maxCount = tags.reduce((max, [, count]) => Math.max(max, count), 1);
+---
+
+<div class="widget-stack">
+	<ClockCard client:visible />
+	{
+		building && (
+			<NowBuilding
+				client:visible
+				title={building.data.title}
+				status={building.data.status}
+				href={withBase(`/projects/${building.id}/go`)}
+			/>
+		)
+	}
+
+	{
+		tags.length > 0 && (
+			<section class="widget-card">
+				<h2 class="widget-kicker">标签</h2>
+				<div class="tag-cloud">
+					{tags.map(([tag, count]) => (
+						<span style={`--w:${count / maxCount}`}>{tag}</span>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	{
+		latestNotes.length > 0 && (
+			<section class="widget-card">
+				<h2 class="widget-kicker">最新笔记</h2>
+				<ol class="widget-notes">
+					{latestNotes.map((note) => (
+						<li>
+							<a href={withBase(`/notes/${note.id}`)}>{note.data.title}</a>
+							<time datetime={note.data.pubDate.toISOString()}>{formatDate(note.data.pubDate)}</time>
+						</li>
+					))}
+				</ol>
+			</section>
+		)
+	}
+
+	<section class="widget-card">
+		<h2 class="widget-kicker">公开动态</h2>
+		<div class="activity-week" aria-hidden="true">
+			{
+				activity.week.map((count) => (
+					<span class:list={['activity-cell', { 'is-on': count > 0 }]} style={`--n:${Math.min(count, 4)}`} />
+				))
+			}
+		</div>
+		{
+			activity.ok ? (
+				<ol class="activity-list">
+					{activity.items.map((item) => (
+						<li>
+							<a href={item.href}>{item.title}</a>
+							<time>{item.meta}</time>
+						</li>
+					))}
+				</ol>
+			) : (
+				<p class="widget-fallback">这次构建没有拉到公开动态。</p>
+			)
+		}
+		<a class="widget-more" href={GITHUB_URL}>GitHub</a>
+	</section>
+</div>

@@ -13,7 +13,7 @@ const notes = await getNotes();
 	<h1 class="visually-hidden">笔记</h1>
 	<HeroHeading client:visible className="page-title" text="笔记" />
 	<p class="page-desc">不写教程腔。只记自己打到公网时真正翻过的车。</p>
-	<div class="section">
+	<div class="section" id="recent-notes">
 		<NoteList notes={notes} />
 	</div>
 </BaseLayout>

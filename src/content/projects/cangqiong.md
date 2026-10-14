@@ -6,6 +6,7 @@ stack:
   - Spring Boot
   - uni-app
 status: 已上线
+demo: cangqiong
 href: https://cjameng.top/h5/
 order: 1
 ---

@@ -1,5 +1,6 @@
 ---
 import { GITHUB_URL, SITE_AUTHOR } from '../consts';
+import LowEffectsToggle from './LowEffectsToggle';
 import ShinyLabel from './ShinyLabel';
 ---
 
@@ -9,6 +10,7 @@ import ShinyLabel from './ShinyLabel';
 			© {new Date().getFullYear()}{' '}
 			<ShinyLabel client:visible text={SITE_AUTHOR} />
 		</span>
+		<LowEffectsToggle client:load />
 		<a href={GITHUB_URL}>GitHub</a>
 	</div>
 </footer>

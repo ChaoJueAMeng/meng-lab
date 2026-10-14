@@ -5,6 +5,7 @@ stack:
   - Rust
   - Tauri
 status: 公开仓库
+demo: meng-meter
 href: https://github.com/ChaoJueAMeng/meng-meter/releases
 order: 3
 ---

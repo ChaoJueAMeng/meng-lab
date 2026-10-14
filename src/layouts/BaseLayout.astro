@@ -1,19 +1,27 @@
 ---
 import '../styles/global.css';
+import '../styles/upgrade.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import SideNav from '../components/SideNav.astro';
+import Widgets from '../components/Widgets.astro';
 import AuroraBackground from '../components/AuroraBackground';
 import SiteClickSpark from '../components/SiteClickSpark';
+import StarTrail from '../components/bits/StarTrail';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import { pageIdFromPath } from '../lib/page';
 import { withBase } from '../lib/paths';
 
 interface Props {
 	title?: string;
 	description?: string;
+	noindex?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION } = Astro.props;
+const { title, description = SITE_DESCRIPTION, noindex = false } = Astro.props;
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
+const page = pageIdFromPath(Astro.url.pathname);
+const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.href;
 ---
 
 <!doctype html>
@@ -34,6 +42,9 @@ const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 				document.documentElement.dataset.theme = theme;
 				document.documentElement.dataset.themePref = pref;
 				document.documentElement.style.colorScheme = theme;
+				if (localStorage.getItem('meng-lab-effects') === 'low') {
+					document.documentElement.dataset.effects = 'low';
+				}
 			})();
 		</script>
 		<link rel="icon" href={withBase('/favicon.ico')} sizes="any" />
@@ -43,17 +54,32 @@ const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="light dark" />
+		{noindex && <meta name="robots" content="noindex, nofollow" />}
+		<meta property="og:title" content={pageTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonical} />
+		<link rel="canonical" href={canonical} />
 		<link rel="alternate" type="application/rss+xml" title={SITE_TITLE} href={withBase('/rss.xml')} />
 		<title>{pageTitle}</title>
 	</head>
-	<body>
+	<body data-page={page}>
 		<div class="site-shell">
 			<AuroraBackground client:idle />
+			<StarTrail client:idle />
 			<SiteClickSpark client:idle />
 			<Header />
-			<main class="wrap">
-				<slot />
-			</main>
+			<div class="site-frame">
+				<aside class="site-aside side-aside">
+					<SideNav />
+				</aside>
+				<main class="wrap">
+					<slot />
+				</main>
+				<aside class="site-aside widgets-aside">
+					<Widgets />
+				</aside>
+			</div>
 			<Footer />
 		</div>
 	</body>

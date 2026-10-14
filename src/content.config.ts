@@ -19,6 +19,7 @@ const projects = defineCollection({
 		summary: z.string(),
 		stack: z.array(z.string()),
 		href: z.string().url().optional(),
+		demo: z.enum(['notiask', 'meng-meter', 'pulsechat', 'm-harness', 'cangqiong', 'none']).default('none'),
 		status: z.string(),
 		order: z.number().default(0),
 	}),
