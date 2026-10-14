@@ -30,7 +30,6 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const sparksRef = useRef<Spark[]>([]);
-	const startTimeRef = useRef<number | null>(null);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -81,57 +80,6 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		[easing],
 	);
 
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		const ctx = canvas.getContext('2d');
-		if (!ctx) return;
-
-		let animationId: number;
-
-		const draw = (timestamp: number) => {
-			if (!startTimeRef.current) {
-				startTimeRef.current = timestamp;
-			}
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-			sparksRef.current = sparksRef.current.filter((spark: Spark) => {
-				const elapsed = timestamp - spark.startTime;
-				if (elapsed >= duration) {
-					return false;
-				}
-
-				const progress = elapsed / duration;
-				const eased = easeFunc(progress);
-
-				const distance = eased * sparkRadius * extraScale;
-				const lineLength = sparkSize * (1 - eased);
-
-				const x1 = spark.x + distance * Math.cos(spark.angle);
-				const y1 = spark.y + distance * Math.sin(spark.angle);
-				const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
-				const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
-
-				ctx.strokeStyle = sparkColor;
-				ctx.lineWidth = 2;
-				ctx.beginPath();
-				ctx.moveTo(x1, y1);
-				ctx.lineTo(x2, y2);
-				ctx.stroke();
-
-				return true;
-			});
-
-			animationId = requestAnimationFrame(draw);
-		};
-
-		animationId = requestAnimationFrame(draw);
-
-		return () => {
-			cancelAnimationFrame(animationId);
-		};
-	}, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
-
 	const spawnSparks = (clientX: number, clientY: number) => {
 		const canvas = canvasRef.current;
 		if (!canvas) return;
@@ -151,12 +99,70 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 	};
 
 	useEffect(() => {
+		const canvas = canvasRef.current;
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
+		if (!ctx) return;
+
+		let animationId = 0;
+		let running = false;
+
+		const draw = (timestamp: number) => {
+			if (document.hidden) {
+				running = false;
+				return;
+			}
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			sparksRef.current = sparksRef.current.filter((spark: Spark) => {
+				const elapsed = timestamp - spark.startTime;
+				if (elapsed >= duration) return false;
+				const progress = elapsed / duration;
+				const eased = easeFunc(progress);
+				const distance = eased * sparkRadius * extraScale;
+				const lineLength = sparkSize * (1 - eased);
+				const x1 = spark.x + distance * Math.cos(spark.angle);
+				const y1 = spark.y + distance * Math.sin(spark.angle);
+				const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
+				const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
+				ctx.strokeStyle = sparkColor;
+				ctx.lineWidth = 2;
+				ctx.beginPath();
+				ctx.moveTo(x1, y1);
+				ctx.lineTo(x2, y2);
+				ctx.stroke();
+				return true;
+			});
+			if (sparksRef.current.length > 0) animationId = requestAnimationFrame(draw);
+			else running = false;
+		};
+
+		const start = () => {
+			if (running || document.hidden || sparksRef.current.length === 0) return;
+			running = true;
+			animationId = requestAnimationFrame(draw);
+		};
+
 		const onPointerDown = (event: PointerEvent) => {
 			spawnSparks(event.clientX, event.clientY);
+			start();
 		};
+		const onVis = () => {
+			if (document.hidden) {
+				running = false;
+				cancelAnimationFrame(animationId);
+				return;
+			}
+			start();
+		};
+
 		document.addEventListener('pointerdown', onPointerDown);
-		return () => document.removeEventListener('pointerdown', onPointerDown);
-	}, [sparkCount]);
+		document.addEventListener('visibilitychange', onVis);
+		return () => {
+			cancelAnimationFrame(animationId);
+			document.removeEventListener('pointerdown', onPointerDown);
+			document.removeEventListener('visibilitychange', onVis);
+		};
+	}, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
 
 	const handleClick = (e: React.MouseEvent<HTMLDivElement>): void => {
 		if (children) spawnSparks(e.clientX, e.clientY);

@@ -2,7 +2,7 @@
   "name": "meng-lab",
   "type": "module",
   "version": "0.0.1",
-  "description": "萌实验室：萌的工程手记",
+  "description": "阿萌的实验室：阿萌的工程手记",
   "packageManager": "npm@10.9.2",
   "engines": {
     "node": ">=22.12.0",
@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@astrojs/react": "^6.0.6",
-    "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.3.3",
     "motion": "^13.4.0",

@@ -1,14 +1,10 @@
 ---
+import { NAV_ITEMS, isCurrent } from '../lib/nav';
 import { stripBase, withBase } from '../lib/paths';
 import BrandMagnet from './BrandMagnet';
 import ThemeToggle from './ThemeToggle';
 
 const path = stripBase(Astro.url.pathname);
-
-function current(href: string) {
-	if (href === '/') return path === '/';
-	return path === href || path.startsWith(`${href}/`);
-}
 ---
 
 <header class="site-header">
@@ -18,15 +14,18 @@ function current(href: string) {
 				<span class="brand-mark">
 					<img src={withBase('/apple-touch-icon.png')} alt="" width="27" height="27" />
 				</span>
-				萌实验室
+				阿萌的实验室
 			</a>
 		</BrandMagnet>
 		<div class="header-end">
 			<nav class="nav" aria-label="主导航">
-				<a href={withBase('/')} aria-current={current('/') ? 'page' : undefined}>主页</a>
-				<a href={withBase('/notes')} aria-current={current('/notes') ? 'page' : undefined}>笔记</a>
-				<a href={withBase('/projects')} aria-current={current('/projects') ? 'page' : undefined}>作品</a>
-				<a href={withBase('/about')} aria-current={current('/about') ? 'page' : undefined}>关于</a>
+				{
+					NAV_ITEMS.map((item) => (
+						<a href={withBase(item.href)} aria-current={isCurrent(path, item.href) ? 'page' : undefined}>
+							{item.label}
+						</a>
+					))
+				}
 			</nav>
 			<ThemeToggle client:load />
 		</div>

@@ -19,6 +19,7 @@ const projects = defineCollection({
 		summary: z.string(),
 		stack: z.array(z.string()),
 		href: z.string().url().optional(),
+		readme: z.union([z.string().url(), z.literal('private')]).optional(),
 		status: z.string(),
 		order: z.number().default(0),
 	}),

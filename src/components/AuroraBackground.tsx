@@ -1,10 +1,28 @@
+import { useEffect, useState } from 'react';
 import Aurora from './bits/Aurora';
 import { useTheme } from '../hooks/useTheme';
 
+function effectsAllowed() {
+	return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 export default function AuroraBackground() {
 	const theme = useTheme();
+	const [on, setOn] = useState(false);
 	const colorStops =
 		theme === 'dark' ? ['#c45c26', '#e8a06a', '#8b3d1a'] : ['#e8a06a', '#c45c26', '#f3d2b3'];
+
+	useEffect(() => {
+		const sync = () => setOn(effectsAllowed());
+		sync();
+		const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+		media.addEventListener('change', sync);
+		return () => {
+			media.removeEventListener('change', sync);
+		};
+	}, []);
+
+	if (!on) return null;
 
 	return (
 		<div className="aurora-layer" aria-hidden="true">

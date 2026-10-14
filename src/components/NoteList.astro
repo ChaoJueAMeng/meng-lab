@@ -21,7 +21,9 @@ const { notes } = Astro.props;
 							{formatDate(note.data.pubDate)}
 						</time>
 						<div>
-							<a href={withBase(`/notes/${note.id}`)}>{note.data.title}</a>
+							<a class="stretch-link" href={withBase(`/notes/${note.id}`)}>
+								<span class="stretch-label">{note.data.title}</span>
+							</a>
 							{note.data.tags.length > 0 && (
 								<div class="tags">
 									{note.data.tags.map((tag) => (

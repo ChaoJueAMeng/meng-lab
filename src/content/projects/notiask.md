@@ -6,5 +6,131 @@ stack:
   - Android
 status: 公开仓库
 href: https://github.com/ChaoJueAMeng/NotiAsk
+readme: https://github.com/ChaoJueAMeng/NotiAsk/blob/main/README.md
 order: 2
 ---
+
+<div align="center">
+
+# NotiAsk
+AI 不应该总藏在 App 里。
+### NotiAsk 把 AI 入口放进你每天都会打开的*通知栏*。
+
+**下拉通知栏 → 提问 → 在通知栏查看回答。**
+
+[English](https://github.com/ChaoJueAMeng/NotiAsk/blob/main/README.en.md) · [功能特性](#-核心特性) · [快速开始](#-快速开始) · [服务商配置](#-服务商配置) · [隐私与安全](#-隐私与安全)
+
+</div>
+
+<!--
+  建议在发布前在此放入 10–20 秒演示 GIF：
+  下拉通知栏 → 输入问题 → 查看回答 → 截屏搜索。
+  示例：![NotiAsk demo](https://github.com/ChaoJueAMeng/NotiAsk/raw/main/docs/demo.gif)
+-->
+
+## 🎯 为什么选择 NotiAsk？
+
+常见的 AI 使用路径是：
+
+> **正在使用App → 想到问题 → 切换APP或开启浮窗来向AI提问 → 等待回答··· → 再切回原来的APP**
+
+NotiAsk 想把它改进为：
+
+> **正在使用App → 想到问题 → 下拉通知栏向AI提问 → 继续手头的事 → 随时在通知栏查看回答**
+
+NotiAsk 的优势在于：
+
+- **无需退出正在使用的App或分屏浮窗，下拉通知栏即问，也可以一键截屏提问**
+- **输入问题时，你可以随时轻易地上滑返回，再看一眼你要问什么、或者再回复一条消息，NotiAsk会保留你的提问草稿**
+- **提问后，AI 会在后台生成回答，你可以继续手头的事**
+- **回答完成后会发送通知，你可以随时在通知栏展开查看和复制**
+
+### 它不试图成为另一个聊天客户端，而是让 AI 在需要时像系统功能一样随手可用：更少的界面切换，更少的打断。
+
+## ✨ 核心特性
+
+>- **通知栏直接提问**：使用 Android Direct Reply，在常驻通知的输入框中发问。
+>- **回答留在通知栏**：AI 的回答以可展开通知呈现，可一键复制到剪贴板。
+>- **截屏后提问**：从通知栏发起截屏；截屏完成后可补充问题，或让支持视觉的模型直接解读屏幕内容。
+>- **通知栏内切换模型**：不打开 App 也能在已保存的配置之间切换；当前模型会置顶，配置较多时支持分页。
+>- **多服务商、多配置**：可保存并命名多套 API 配置，随时设为当前使用的模型。
+>- **直连 AI 服务商**：没有 NotiAsk 自建后端；请求从你的设备直接发送给你配置的服务商。
+>- **本地加密保存密钥**：API Key 使用 Android Keystore 中不可导出的密钥加密后保存在本机。
+
+## 📱 使用方式
+
+```text
+添加 AI 配置并启用通知权限
+              ↓
+下拉并展开 NotiAsk 常驻通知
+              ↓
+提问 / 切换模型 / 截屏搜索
+              ↓
+在通知栏阅读、复制 AI 回答
+```
+
+NotiAsk 采用**单轮问答**：每次提问独立发送，不会自动附带之前的问题或回答。
+
+## 🚀 快速开始
+
+### 要求
+
+- Android 10（API 29）或更高版本
+- 一组来自所选 AI 服务商的 API Key
+- Android 13 及以上设备需授予通知权限
+
+### 配置与提问
+
+1. 安装应用后，打开 NotiAsk，点击「添加」。
+2. 选择服务商，填写 API Key、Base URL 和模型名称；需要的话为该配置命名。
+3. 保存时勾选「保存后使用该模型」，再点击「启用通知栏问答」。
+4. 按系统提示授予通知权限。
+5. 下拉并展开 NotiAsk 常驻通知：
+   - 点击「提问」，在通知输入框中发送问题；
+   - 点击「切换模型」，从已保存的配置中选择模型；
+   - 点击「截屏搜索」，完成系统授权后，在「已截图」通知中补充问题，或点击「直接提问」。
+6. 展开回答通知阅读结果；点击「复制」可复制回答。
+
+> 某些系统会积极限制后台服务。若常驻通知不稳定，可在应用的「电池优化」入口中将 NotiAsk 加入允许名单。
+
+## 🤖 服务商配置
+
+| 服务商 | App 内选项 | Base URL | 协议 |
+| --- | --- | --- | --- |
+| OpenAI | OpenAI | `https://api.openai.com/v1` | Chat Completions 兼容 |
+| Anthropic | Anthropic | `https://api.anthropic.com` | 原生 Messages |
+| 通义千问 | 通义千问 / DashScope | `https://dashscope.aliyuncs.com/compatible-mode/v1` | Chat Completions 兼容 |
+| DeepSeek | DeepSeek | `https://api.deepseek.com` | Chat Completions 兼容 |
+| Kimi | Kimi / Moonshot | `https://api.moonshot.cn/v1` | Chat Completions 兼容 |
+| 其他服务 | OpenAI 兼容接口 | 服务商提供的 API 根地址 | Chat Completions 兼容 |
+
+- Base URL 填写 API 的**根地址**即可；NotiAsk 会自动补齐接口路径。
+- 模型名称请以服务商当前文档为准。
+- 「截屏搜索」需要当前模型及其 API 接口支持图片输入。若不支持，应用会给出失败提示。
+
+## 🔐 隐私与安全
+
+- API Key 使用 Android Keystore 中不可导出的 AES-GCM 密钥加密后才写入应用私有存储。
+- NotiAsk 不运营自建 API 中转服务器；你的问题、截图和 API Key 不会发送给开发者服务器。
+- 提问内容和（如使用）截图会发送给你主动配置的 AI 服务商，请同时阅读该服务商的隐私政策与数据处理条款。
+- 截图在内存中仅保留到当前提问被取走或丢弃，不作为应用媒体库文件保存。
+
+## ❓常见问题
+
+**为什么看不到通知输入框？** 先确认已有可用配置且已启用「通知栏问答」。在 Android 13+，还需在系统弹窗中允许通知。
+
+**能否连续对话？** 当前版本是单轮问答，不携带历史上下文。
+
+**误滑掉了常驻通知怎么办？** 应用会尝试恢复；若仍未出现，打开 NotiAsk 并确认服务状态与通知权限。
+
+**为什么重启后需要重新启用？** 为遵循 Android 的后台与前台服务限制，设备重启后需要手动重新启用。
+
+## 🤝 贡献
+
+欢迎提交 Issue、功能建议和 Pull Request。尤其欢迎真实设备上的通知兼容性反馈，以及更多 OpenAI-compatible 服务商的配置经验。
+
+如果 NotiAsk 对你有帮助，欢迎点一个 Star，让更多人发现这种更轻量的 AI 使用方式。
+
+## 📄 许可证
+
+NotiAsk 采用 MIT 许可证

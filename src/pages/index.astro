@@ -15,14 +15,14 @@ const projects = (await getProjects()).slice(0, 5);
 <BaseLayout>
 	<section class="hero">
 		<HeroKicker client:visible text="meng-lab" />
-		<h1 class="visually-hidden">把能上线的东西写下来。</h1>
-		<HeroHeading client:visible text="把能上线的东西写下来。" />
+		<h1 class="visually-hidden">把做过的事记下来。</h1>
+		<HeroHeading client:visible text="把做过的事记下来。" />
 		<p class="lede">
-			萌的工程手记。外卖、聊天、Agent、字幕流水线——先跑到公网上，再把踩过的坑记在这里。
+			阿萌的工程手记。外卖、聊天、小工具、Harness ——把过程、心得和踩过的坑都写在这里。
 		</p>
 	</section>
 
-	<section class="section">
+	<section class="section" id="works">
 		<div class="section-head">
 			<h2>作品</h2>
 			<a class="more" href={withBase('/projects')}>
@@ -32,7 +32,7 @@ const projects = (await getProjects()).slice(0, 5);
 		<ProjectList projects={projects} />
 	</section>
 
-	<section class="section">
+	<section class="section" id="recent-notes">
 		<div class="section-head">
 			<h2>最近笔记</h2>
 			<a class="more" href={withBase('/notes')}>

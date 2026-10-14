@@ -411,7 +411,7 @@ main {
 }
 
 .project-item {
-	position: relative;
+	position: static;
 	z-index: 1;
 }
 
@@ -472,11 +472,32 @@ main {
 	margin-top: 0;
 }
 
+.prose h1,
 .prose h2,
 .prose h3 {
 	font-family: var(--font-serif);
 	margin: 2.2rem 0 0.7rem;
 	line-height: 1.4;
+}
+
+.prose img {
+	max-width: 100%;
+	height: auto;
+}
+
+.prose table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 0 0 1.15rem;
+	font-size: 0.92rem;
+}
+
+.prose th,
+.prose td {
+	border: 1px solid var(--line);
+	padding: 0.4rem 0.65rem;
+	text-align: left;
+	vertical-align: top;
 }
 
 .prose p,
@@ -579,7 +600,8 @@ html[data-theme='dark'] .astro-code span {
 		animation: none !important;
 	}
 
-	.aurora-layer {
+	.aurora-layer,
+	.star-trail {
 		display: none;
 	}
 }

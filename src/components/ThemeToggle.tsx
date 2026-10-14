@@ -11,16 +11,22 @@ export default function ThemeToggle() {
 	const [pref, setPref] = useState<ThemePref>('light');
 
 	useEffect(() => {
-		const current = getThemePref();
-		setPref(current);
-		applyTheme(current);
+		const sync = () => setPref(getThemePref());
+		sync();
+		applyTheme(getThemePref());
 
 		const media = window.matchMedia('(prefers-color-scheme: dark)');
 		const onSystemChange = () => {
 			if (getThemePref() === 'system') applyTheme('system');
+			sync();
 		};
+		const observer = new MutationObserver(sync);
+		observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme-pref'] });
 		media.addEventListener('change', onSystemChange);
-		return () => media.removeEventListener('change', onSystemChange);
+		return () => {
+			media.removeEventListener('change', onSystemChange);
+			observer.disconnect();
+		};
 	}, []);
 
 	return (
