@@ -280,7 +280,7 @@ html[data-effects='low'] .star-trail {
 .nav a:focus-visible,
 .side-anchors a:focus-visible,
 .transit-cta:focus-visible,
-.transit-jump a:focus-visible,
+.transit-source a:focus-visible,
 .transit-back:focus-visible {
 	outline: 2px solid var(--accent-soft);
 	outline-offset: 3px;
@@ -411,11 +411,19 @@ body[data-page='about'] .nav a[aria-current='page'] {
 	scroll-margin-top: 5.5rem;
 }
 
-.demo-disclaimer,
+.transit-source,
 .transit-missing,
 .transit-url {
 	color: var(--muted);
 	line-height: 1.7;
+}
+
+.transit-source a {
+	color: var(--accent-soft);
+}
+
+.transit .prose {
+	max-width: none;
 }
 
 .transit-url {

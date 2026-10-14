@@ -1,11 +1,5 @@
 ---
 import { render } from 'astro:content';
-import SkipTransit from '../../../components/demo/SkipTransit';
-import CangqiongDemo from '../../../components/demo/CangqiongDemo';
-import MHarnessDemo from '../../../components/demo/MHarnessDemo';
-import MengMeterDemo from '../../../components/demo/MengMeterDemo';
-import NotiAskDemo from '../../../components/demo/NotiAskDemo';
-import PulseChatDemo from '../../../components/demo/PulseChatDemo';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { getProjects } from '../../../lib/content';
 import { withBase } from '../../../lib/paths';
@@ -21,50 +15,39 @@ export async function getStaticPaths() {
 const { project } = Astro.props;
 const { Content } = await render(project);
 const href = project.data.href;
-const demo = project.data.demo;
+const readme = project.data.readme;
 const back = withBase('/projects');
 ---
 
 <BaseLayout
-	title={`${project.data.title} · 体验`}
-	description={`本地模拟 ${project.data.title}。${project.data.summary}`}
+	title={readme ? `${project.data.title} · README` : project.data.title}
+	description={project.data.summary}
 	noindex
 >
 	<article class="transit">
-		<p class="kicker">体验</p>
+		<p class="kicker">{readme ? 'README' : '说明'}</p>
 		<h1 class="page-title">
 			{project.data.title}
 			<span class="project-status">{project.data.status}</span>
 		</h1>
 		<p class="page-desc">{project.data.summary}</p>
 		{
-			demo === 'none' ? (
-				<p class="demo-disclaimer">这个作品没有公开演示。下面是说明，不会跳到外部地址。</p>
-			) : (
-				<p class="demo-disclaimer">这一页是本地模拟，用来感受用法。它不是正在运行的线上服务。</p>
-			)
-		}
-		{
-			href && (
-				<p class="transit-jump">
-					<a href={href} target="_blank" rel="noopener">
-						跳过模拟，直接前往
+			readme === 'private' ? (
+				<p class="transit-source">仓库没有公开。下面是 README 摘录。</p>
+			) : readme ? (
+				<p class="transit-source">
+					摘自仓库 README ·
+					<a href={readme} target="_blank" rel="noopener">
+						在 GitHub 打开
 					</a>
 				</p>
+			) : (
+				<p class="transit-source">这个作品没有公开 README。下面是说明，不会跳到外部地址。</p>
 			)
 		}
-		{demo === 'notiask' && <NotiAskDemo client:visible />}
-		{demo === 'meng-meter' && <MengMeterDemo client:visible />}
-		{demo === 'pulsechat' && <PulseChatDemo client:visible />}
-		{demo === 'm-harness' && <MHarnessDemo client:visible />}
-		{demo === 'cangqiong' && <CangqiongDemo client:visible />}
-		{
-			demo === 'none' && (
-				<div class="prose">
-					<Content />
-				</div>
-			)
-		}
+		<div class="prose">
+			<Content />
+		</div>
 		{
 			href ? (
 				<div class="transit-actions">
@@ -77,7 +60,6 @@ const back = withBase('/projects');
 					<a class="transit-cta" href={href} target="_blank" rel="noopener">
 						前往原地址
 					</a>
-					<SkipTransit client:visible id={project.id} href={href} />
 				</div>
 			) : (
 				<p class="transit-missing">这个作品没有公开地址。</p>

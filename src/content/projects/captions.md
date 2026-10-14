@@ -6,7 +6,6 @@ stack:
   - Whisper
   - ASS
 status: 自用工具
-demo: none
 order: 7
 ---
 
