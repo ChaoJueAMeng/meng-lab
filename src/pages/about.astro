@@ -2,28 +2,27 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import HeroHeading from '../components/HeroHeading';
 import HeroKicker from '../components/HeroKicker';
-import { GITHUB_URL } from '../consts';
-import { withBase } from '../lib/paths';
+import { GITHUB_REPO, GITHUB_URL } from '../consts';
 ---
 
-<BaseLayout title="关于" description="萌，在做能跑上线的东西。">
+<BaseLayout title="关于" description="我是阿萌。这里记做过的项目，和当时怎么翻的车。">
 	<HeroKicker client:visible text="About" />
 	<h1 class="visually-hidden">关于</h1>
 	<HeroHeading client:visible className="page-title" text="关于" />
 	<div class="about">
 		<p>
-			我是萌，GitHub 上是 <a href={GITHUB_URL}>ChaoJueAMeng</a>。
-			会把东西打到公网上：外卖挂在自己的域名上，聊天跑在子域名上，Agent 和字幕流水线也是为了真的能用。
+			我是阿萌，GitHub 账号是 <a href={GITHUB_URL}>ChaoJueAMeng</a>。
 		</p>
 		<p>
-			这个站不是简历，也不是课程笔记合集。首页、笔记、作品三块平级——文章写踩坑，作品写已经发生过的事。
+			苍穹外卖和 PulseChat 已经部署上线。
+			NotiAsk 和 M-harness，是用来练手和自用的。
 		</p>
 		<p>
-			技术栈不洁癖。Java / Spring、uni-app、Cloudflare Workers、偶尔 Next.js，哪个能把问题送上线就用哪个。
-			根域名给业务占着，这个站以后会走 <code>notes.cjameng.top</code> 或 <code>lab.cjameng.top</code>。
+			Java / Spring 最熟。Vue、JS、、Kotlin、C# 都在各个项目中接触过。
+			这个实验室是 Astro 静态站。
 		</p>
 		<p>
-			订阅用 <a href={withBase('/rss.xml')}>RSS</a>。源码在 <a href="https://github.com/ChaoJueAMeng/meng-lab">meng-lab</a>。
+			实验室页面仓库在 <a href={GITHUB_REPO}>meng-lab</a>。
 		</p>
 	</div>
 </BaseLayout>

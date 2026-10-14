@@ -8,11 +8,11 @@ import { getProjects } from '../../lib/content';
 const projects = await getProjects();
 ---
 
-<BaseLayout title="作品" description="打到过公网、或正在打到公网的项目。">
+<BaseLayout title="作品" description="已部署上线、或正在完善的项目。">
 	<HeroKicker client:visible text="Projects" />
 	<h1 class="visually-hidden">作品</h1>
 	<HeroHeading client:visible className="page-title" text="作品" />
-	<p class="page-desc">能访问、能安装、能翻车的那种。不是作业截图墙。</p>
+	<p class="page-desc">能访问、能安装的真项目，虽然翻过不少车。</p>
 	<div class="section" id="works">
 		<ProjectList projects={projects} />
 	</div>
