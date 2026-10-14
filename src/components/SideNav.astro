@@ -1,29 +1,14 @@
 ---
-import { SITE_AUTHOR } from '../consts';
 import { formatDate, getNotes } from '../lib/content';
 import { isCurrent, NAV_ITEMS, normalizePath } from '../lib/nav';
 import { stripBase, withBase } from '../lib/paths';
-import LowEffectsToggle from './LowEffectsToggle';
-import ThemeToggle from './ThemeToggle';
 
 const path = normalizePath(stripBase(Astro.url.pathname));
 const notes = await getNotes();
 const latest = notes[0];
-const worksHref = path === '/' || path === '/projects' ? '#works' : withBase('/projects');
-const notesHref = path === '/' || path === '/notes' ? '#recent-notes' : withBase('/notes');
 ---
 
 <div class="side-stack">
-	<a class="side-id" href={withBase('/')}>
-		<span class="brand-mark">
-			<img src={withBase('/apple-touch-icon.png')} alt="" width="36" height="36" />
-		</span>
-		<span>
-			<strong>萌实验室</strong>
-			<small>{SITE_AUTHOR}</small>
-		</span>
-	</a>
-
 	<nav class="nav side-nav-links" aria-label="主导航">
 		{
 			NAV_ITEMS.map((item) => (
@@ -32,16 +17,6 @@ const notesHref = path === '/' || path === '/notes' ? '#recent-notes' : withBase
 				</a>
 			))
 		}
-	</nav>
-
-	<div class="side-tools">
-		<ThemeToggle client:load />
-		<LowEffectsToggle client:load />
-	</div>
-
-	<nav class="side-anchors" aria-label="页面章节">
-		<a href={worksHref}>作品</a>
-		<a href={notesHref}>笔记</a>
 	</nav>
 
 	{

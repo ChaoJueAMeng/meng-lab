@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { EFFECTS_EVENT } from '../../lib/effects';
 
 interface Star {
 	x: number;
@@ -11,13 +10,13 @@ interface Star {
 	ttl: number;
 }
 
-const MAX_STARS = 120;
-const LINK_DISTANCE = 110;
+const MAX_STARS = 12;
+const LINK_DISTANCE = 72;
 
 function parseColor(input: string) {
 	const value = input.trim();
 	const hex = value.match(/^#([\da-f]{6})$/i);
-	if (!hex) return [196, 92, 38] as const;
+	if (!hex) return [77, 150, 224] as const;
 	const n = parseInt(hex[1], 16);
 	return [(n >> 16) & 255, (n >> 8) & 255, n & 255] as const;
 }
@@ -28,7 +27,6 @@ function rgba(rgb: readonly [number, number, number], alpha: number) {
 }
 
 function canRun() {
-	if (document.documentElement.dataset.effects === 'low') return false;
 	if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
 	if (window.matchMedia('(pointer: coarse)').matches) return false;
 	return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
@@ -54,24 +52,21 @@ function attach(canvas: HTMLCanvasElement) {
 		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 	};
 
-	const color = () => parseColor(getComputedStyle(document.documentElement).getPropertyValue('--trail') || '#c45c26');
+	const color = () => parseColor(getComputedStyle(document.documentElement).getPropertyValue('--trail') || '#4d96e0');
 
 	const spawn = (now: number, x: number, y: number) => {
-		if (now - lastSpawn < 16) return;
+		if (now - lastSpawn < 90) return;
 		lastSpawn = now;
-		const count = 1 + Math.floor(Math.random() * 3);
-		for (let i = 0; i < count; i++) {
-			if (stars.length >= MAX_STARS) stars.shift();
-			stars.push({
-				x: x + (Math.random() - 0.5) * 14,
-				y: y + (Math.random() - 0.5) * 14,
-				vx: vx * 0.15 + (Math.random() - 0.5) * 0.7,
-				vy: vy * 0.15 + (Math.random() - 0.5) * 0.7,
-				r: 0.7 + Math.random() * 1.6,
-				life: 1,
-				ttl: 0.007 + Math.random() * 0.01,
-			});
-		}
+		if (stars.length >= MAX_STARS) stars.shift();
+		stars.push({
+			x: x + (Math.random() - 0.5) * 8,
+			y: y + (Math.random() - 0.5) * 8,
+			vx: vx * 0.12 + (Math.random() - 0.5) * 0.35,
+			vy: vy * 0.12 + (Math.random() - 0.5) * 0.35,
+			r: 0.8 + Math.random() * 1.1,
+			life: 1,
+			ttl: 0.02 + Math.random() * 0.016,
+		});
 	};
 
 	const tick = () => {
@@ -192,12 +187,10 @@ export default function StarTrail() {
 		const coarse = window.matchMedia('(pointer: coarse)');
 		reduced.addEventListener('change', sync);
 		coarse.addEventListener('change', sync);
-		document.documentElement.addEventListener(EFFECTS_EVENT, sync);
 		return () => {
 			stop();
 			reduced.removeEventListener('change', sync);
 			coarse.removeEventListener('change', sync);
-			document.documentElement.removeEventListener(EFFECTS_EVENT, sync);
 		};
 	}, []);
 

@@ -411,7 +411,7 @@ main {
 }
 
 .project-item {
-	position: relative;
+	position: static;
 	z-index: 1;
 }
 
