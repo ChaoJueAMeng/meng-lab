@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 interface ClickSparkProps {
 	sparkColor?: string;
@@ -30,6 +30,8 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 }) => {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const sparksRef = useRef<Spark[]>([]);
+	const configRef = useRef({ sparkColor, sparkSize, sparkRadius, sparkCount, duration, easing, extraScale });
+	configRef.current = { sparkColor, sparkSize, sparkRadius, sparkCount, duration, easing, extraScale };
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -64,39 +66,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		};
 	}, []);
 
-	const easeFunc = useCallback(
-		(t: number) => {
-			switch (easing) {
-				case 'linear':
-					return t;
-				case 'ease-in':
-					return t * t;
-				case 'ease-in-out':
-					return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-				default:
-					return t * (2 - t);
-			}
-		},
-		[easing],
-	);
-
-	const spawnSparks = (clientX: number, clientY: number) => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		const rect = canvas.getBoundingClientRect();
-		const x = clientX - rect.left;
-		const y = clientY - rect.top;
-
-		const now = performance.now();
-		const newSparks: Spark[] = Array.from({ length: sparkCount }, (_, i) => ({
-			x,
-			y,
-			angle: (2 * Math.PI * i) / sparkCount,
-			startTime: now,
-		}));
-
-		sparksRef.current.push(...newSparks);
-	};
+	const spawnRef = useRef<(clientX: number, clientY: number) => void>(() => {});
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -107,17 +77,31 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		let animationId = 0;
 		let running = false;
 
+		const ease = (t: number) => {
+			switch (configRef.current.easing) {
+				case 'linear':
+					return t;
+				case 'ease-in':
+					return t * t;
+				case 'ease-in-out':
+					return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+				default:
+					return t * (2 - t);
+			}
+		};
+
 		const draw = (timestamp: number) => {
 			if (document.hidden) {
 				running = false;
 				return;
 			}
+			const { sparkColor, sparkSize, sparkRadius, duration, extraScale } = configRef.current;
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			sparksRef.current = sparksRef.current.filter((spark: Spark) => {
 				const elapsed = timestamp - spark.startTime;
 				if (elapsed >= duration) return false;
 				const progress = elapsed / duration;
-				const eased = easeFunc(progress);
+				const eased = ease(progress);
 				const distance = eased * sparkRadius * extraScale;
 				const lineLength = sparkSize * (1 - eased);
 				const x1 = spark.x + distance * Math.cos(spark.angle);
@@ -142,9 +126,24 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 			animationId = requestAnimationFrame(draw);
 		};
 
-		const onPointerDown = (event: PointerEvent) => {
-			spawnSparks(event.clientX, event.clientY);
+		const spawn = (clientX: number, clientY: number) => {
+			const rect = canvas.getBoundingClientRect();
+			const { sparkCount } = configRef.current;
+			const now = performance.now();
+			const newSparks: Spark[] = Array.from({ length: sparkCount }, (_, i) => ({
+				x: clientX - rect.left,
+				y: clientY - rect.top,
+				angle: (2 * Math.PI * i) / sparkCount,
+				startTime: now,
+			}));
+			sparksRef.current.push(...newSparks);
 			start();
+		};
+
+		spawnRef.current = spawn;
+
+		const onPointerDown = (event: PointerEvent) => {
+			spawn(event.clientX, event.clientY);
 		};
 		const onVis = () => {
 			if (document.hidden) {
@@ -159,13 +158,16 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		document.addEventListener('visibilitychange', onVis);
 		return () => {
 			cancelAnimationFrame(animationId);
+			sparksRef.current = [];
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			spawnRef.current = () => {};
 			document.removeEventListener('pointerdown', onPointerDown);
 			document.removeEventListener('visibilitychange', onVis);
 		};
-	}, [sparkColor, sparkSize, sparkRadius, sparkCount, duration, easeFunc, extraScale]);
+	}, []);
 
 	const handleClick = (e: React.MouseEvent<HTMLDivElement>): void => {
-		if (children) spawnSparks(e.clientX, e.clientY);
+		if (children) spawnRef.current(e.clientX, e.clientY);
 	};
 
 	return (
