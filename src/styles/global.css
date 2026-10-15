@@ -200,34 +200,86 @@ main,
 }
 
 .theme-toggle {
-	display: inline-flex;
-	padding: 0.18rem;
-	border: 1px solid var(--line);
-	border-radius: 999px;
-	background: var(--paper);
+	position: relative;
 }
 
-.theme-toggle button {
+.theme-toggle-trigger,
+.theme-menu button {
 	appearance: none;
-	border: 0;
-	background: transparent;
+	border: 1px solid var(--line);
+	background: var(--paper);
 	color: var(--muted);
-	font: inherit;
-	font-size: 0.74rem;
-	letter-spacing: 0.04em;
-	padding: 0.28rem 0.62rem;
-	border-radius: 999px;
 	cursor: pointer;
 }
 
-.theme-toggle button:hover {
+.theme-toggle-trigger {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.15rem;
+	height: 2.25rem;
+	padding: 0 0.55rem 0 0.62rem;
+	border-radius: 999px;
+}
+
+.theme-toggle-trigger .theme-icon {
+	display: none;
+	place-items: center;
+}
+
+html[data-theme-pref='light'] .theme-toggle-trigger .theme-icon[data-icon='light'],
+html[data-theme-pref='dark'] .theme-toggle-trigger .theme-icon[data-icon='dark'],
+html[data-theme-pref='system'] .theme-toggle-trigger .theme-icon[data-icon='system'] {
+	display: grid;
+}
+
+.theme-chevron {
+	opacity: 0.72;
+}
+
+.theme-toggle-trigger[aria-expanded='true'] .theme-chevron {
+	transform: rotate(180deg);
+}
+
+.theme-toggle-trigger:hover,
+.theme-menu button:hover,
+.theme-toggle-trigger[aria-expanded='true'] {
 	color: var(--text);
 }
 
-.theme-toggle button.is-active,
-html[data-theme-pref='light'] .theme-toggle button[data-option='light'],
-html[data-theme-pref='dark'] .theme-toggle button[data-option='dark'],
-html[data-theme-pref='system'] .theme-toggle button[data-option='system'] {
+.theme-menu {
+	position: absolute;
+	top: calc(100% + 0.4rem);
+	right: 0;
+	z-index: 30;
+	display: grid;
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0.28rem;
+	border: 1px solid var(--line);
+	border-radius: 0.9rem;
+	background: var(--paper);
+	box-shadow: var(--shadow);
+}
+
+.theme-menu[hidden] {
+	display: none;
+}
+
+.theme-menu button {
+	display: grid;
+	place-items: center;
+	width: 2.5rem;
+	height: 2.35rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0.65rem;
+	background: transparent;
+}
+
+.theme-menu button.is-active,
+html[data-theme-pref='light'] .theme-menu button[data-option='light'],
+html[data-theme-pref='dark'] .theme-menu button[data-option='dark'],
+html[data-theme-pref='system'] .theme-menu button[data-option='system'] {
 	background: var(--chip);
 	color: var(--text);
 	box-shadow: inset 0 0 0 1px var(--line);
