@@ -4,6 +4,7 @@ import '../styles/upgrade.css';
 import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import MobileNavDock from '../components/MobileNavDock.astro';
 import AuroraBackground from '../components/AuroraBackground';
 import SiteClickSpark from '../components/SiteClickSpark';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
@@ -57,7 +58,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 		<link rel="icon" href={withBase('/favicon.ico')} sizes="any" />
 		<link rel="icon" type="image/png" href={withBase('/favicon.png')} sizes="64x64" />
 		<link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
 		<meta name="color-scheme" content="light dark" />
@@ -78,9 +79,10 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 				<slot />
 			</main>
 			<Footer />
+			<MobileNavDock />
 		</div>
 		<script>
-			function setupCodeCopy() {
+			function setupProseEnhancements() {
 				const blocks = document.querySelectorAll<HTMLPreElement>('.prose pre');
 				blocks.forEach((pre) => {
 					if (pre.dataset.copyReady === 'true') return;
@@ -124,6 +126,16 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 
 					wrapper.appendChild(btn);
 				});
+
+				const tables = document.querySelectorAll<HTMLTableElement>('.prose table');
+				tables.forEach((table) => {
+					if (table.dataset.scrollReady === 'true') return;
+					table.dataset.scrollReady = 'true';
+					const scroller = document.createElement('div');
+					scroller.className = 'table-scroll-wrap';
+					table.parentNode?.insertBefore(scroller, table);
+					scroller.appendChild(table);
+				});
 			}
 
 			let cleanupScroll: (() => void) | null = null;
@@ -163,7 +175,7 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 			}
 
 			document.addEventListener('astro:page-load', () => {
-				setupCodeCopy();
+				setupProseEnhancements();
 				setupReadingProgress();
 			});
 		</script>

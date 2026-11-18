@@ -11,20 +11,54 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 
 {
 	items.length >= 2 && (
-		<aside class="toc-rail" aria-label="章节目录">
-			<nav class="toc-card">
-				<p class="toc-title">CONTENTS · 目录</p>
-				<ol class="toc-list">
+		<>
+			<details class="mobile-toc">
+				<summary class="mobile-toc-summary">
+					<span class="mobile-toc-label">
+						<span class="mobile-toc-tag">CONTENTS</span>
+						本文目录（{items.length} 节）
+					</span>
+					<svg
+						class="mobile-toc-chevron"
+						viewBox="0 0 24 24"
+						width="16"
+						height="16"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="1.8"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
+					>
+						<path d="m7 10 5 5 5-5" />
+					</svg>
+				</summary>
+				<ol class="mobile-toc-list">
 					{items.map((item) => (
 						<li class:list={['toc-item', { 'is-sub': item.depth === 3 }]}>
-							<a href={`#${item.slug}`} data-toc-link={item.slug}>
+							<a href={`#${item.slug}`} data-mobile-toc-link={item.slug}>
 								{item.text}
 							</a>
 						</li>
 					))}
 				</ol>
-			</nav>
-		</aside>
+			</details>
+
+			<aside class="toc-rail" aria-label="章节目录">
+				<nav class="toc-card">
+					<p class="toc-title">CONTENTS · 目录</p>
+					<ol class="toc-list">
+						{items.map((item) => (
+							<li class:list={['toc-item', { 'is-sub': item.depth === 3 }]}>
+								<a href={`#${item.slug}`} data-toc-link={item.slug}>
+									{item.text}
+								</a>
+							</li>
+						))}
+					</ol>
+				</nav>
+			</aside>
+		</>
 	)
 }
 
@@ -34,6 +68,17 @@ const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
 	function initToc() {
 		cleanupToc?.();
 		cleanupToc = null;
+
+		const details = document.querySelector<HTMLDetailsElement>('details.mobile-toc');
+		if (details && details.dataset.bound !== 'true') {
+			details.dataset.bound = 'true';
+			details.querySelectorAll<HTMLAnchorElement>('[data-mobile-toc-link]').forEach((link) => {
+				link.addEventListener('click', () => {
+					details.open = false;
+				});
+			});
+		}
+
 		const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
 		if (links.length === 0) return;
 

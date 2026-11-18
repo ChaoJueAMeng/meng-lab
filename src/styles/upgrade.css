@@ -37,6 +37,7 @@
 	font-weight: 650;
 	letter-spacing: 0.015em;
 	color: var(--text);
+	text-wrap: balance;
 }
 
 .hero-title {
@@ -1419,48 +1420,150 @@
 	padding: 2.2rem 2rem;
 }
 
+/* Collapsible Mobile TOC (hidden on wide desktop) */
+.mobile-toc {
+	display: none;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 960px) {
 	.hero-grid {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 		padding: 1.35rem 1.25rem;
 		gap: 1.35rem;
 	}
 
 	.article-layout.has-toc {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 1.35rem;
 	}
 
 	.toc-rail {
 		display: none;
 	}
 
+	.mobile-toc {
+		display: block;
+		order: -1;
+		min-width: 0;
+		width: 100%;
+		max-width: 100%;
+		border: 1px solid var(--line);
+		border-radius: 0.85rem;
+		background: var(--paper);
+		box-shadow: var(--shadow-sm);
+		overflow: hidden;
+	}
+
+	.mobile-toc-summary {
+		list-style: none;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.65rem;
+		min-height: 2.85rem;
+		padding: 0.6rem 0.95rem;
+		font-size: 0.86rem;
+		font-weight: 550;
+		color: var(--text);
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.mobile-toc-summary::-webkit-details-marker {
+		display: none;
+	}
+
+	.mobile-toc-label {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.mobile-toc-tag {
+		font-family: var(--font-mono);
+		font-size: 0.66rem;
+		letter-spacing: 0.1em;
+		color: var(--accent-soft);
+		background: var(--accent-wash);
+		padding: 0.08rem 0.38rem;
+		border-radius: 0.28rem;
+	}
+
+	.mobile-toc-chevron {
+		color: var(--muted);
+		transition: transform 0.2s ease;
+		flex-shrink: 0;
+	}
+
+	.mobile-toc[open] .mobile-toc-chevron {
+		transform: rotate(180deg);
+	}
+
+	.mobile-toc-list {
+		list-style: none;
+		margin: 0;
+		padding: 0.35rem 0.95rem 0.85rem;
+		border-top: 1px dashed var(--line);
+		display: grid;
+		gap: 0.15rem;
+	}
+
+	.mobile-toc-list .toc-item a {
+		padding: 0.42rem 0 0.42rem 0.65rem;
+		font-size: 0.85rem;
+	}
+
 	.about-grid,
 	.stack-matrix {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+@media (hover: none) {
+	.project-spotlight:active,
+	.note-journal-card:active,
+	.related-card:active,
+	.pager-card:active,
+	.lab-desk-focus:active,
+	.lab-stat-item:active {
+		transform: scale(0.99);
+		border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+	}
+
+	.btn-primary:active,
+	.btn-paper:active,
+	.filter-pill:active,
+	.card-ext-btn:active {
+		transform: scale(0.97);
 	}
 }
 
 @media (max-width: 720px) {
+	.section {
+		margin-top: 2.65rem;
+	}
+
 	.project-list {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0.85rem;
 	}
 
 	.note-journal-card {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 0.55rem;
-		padding: 1.1rem 1.15rem;
+		padding: 1.05rem 1.08rem;
 	}
 
 	.note-aside-meta {
 		flex-direction: row;
 		align-items: center;
 		flex-wrap: wrap;
-		gap: 0.6rem;
+		gap: 0.55rem;
 		border-right: 0;
 		border-bottom: 1px dashed var(--line);
 		padding-right: 0;
-		padding-bottom: 0.5rem;
+		padding-bottom: 0.48rem;
 	}
 
 	.sheet-provenance {
@@ -1468,11 +1571,197 @@
 	}
 
 	.entry-pager {
-		grid-template-columns: 1fr;
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	.pager-card.is-next {
 		text-align: left;
+	}
+}
+
+@media (max-width: 640px) {
+	/* Hero & Lab Desk mobile density */
+	.hero-grid {
+		padding: 1.15rem 1rem;
+		gap: 1.1rem;
+		border-radius: 1.05rem;
+	}
+
+	.hero-title {
+		font-size: clamp(1.62rem, 6.8vw, 2.05rem);
+		line-height: 1.28;
+	}
+
+	.page-title,
+	.sheet-title,
+	.article-main-title {
+		font-size: clamp(1.48rem, 6.2vw, 1.85rem);
+		line-height: 1.32;
+	}
+
+	.lede {
+		margin-top: 0.8rem;
+		font-size: 0.95rem;
+		line-height: 1.76;
+	}
+
+	.page-desc {
+		font-size: 0.93rem;
+		line-height: 1.72;
+	}
+
+	.hero-actions {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 0.55rem;
+		margin-top: 1.2rem;
+	}
+
+	.hero-actions .btn-primary,
+	.hero-actions .btn-paper {
+		width: 100%;
+		min-height: 2.68rem;
+		padding: 0 0.75rem;
+		font-size: 0.85rem;
+	}
+
+	/* GitHub link is already right below in LabDesk */
+	.hero-actions .btn-ghost {
+		display: none;
+	}
+
+	.lab-desk {
+		padding: 0.88rem 0.92rem;
+		gap: 0.7rem;
+	}
+
+	.lab-desk-focus {
+		padding: 0.68rem 0.78rem;
+	}
+
+	/* Horizontal swipeable single-row filter strip on mobile */
+	.archive-header {
+		padding-bottom: 1.15rem;
+	}
+
+	.filter-bar {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+		margin-top: 1.05rem;
+		margin-inline: -0.65rem;
+		padding-inline: 0.65rem;
+		padding-bottom: 0.15rem;
+		scroll-padding-inline: 0.65rem;
+	}
+
+	.filter-bar::-webkit-scrollbar {
+		display: none;
+	}
+
+	.filter-pill {
+		flex-shrink: 0;
+		height: 2.22rem;
+		padding: 0 0.82rem;
+		white-space: nowrap;
+	}
+
+	/* Project & Note Cards mobile touch ergonomics */
+	.project-spotlight.card-spotlight,
+	.project-bento:not(.is-filtered) .project-cell.is-hero-span .project-spotlight {
+		padding: 1.08rem 1.08rem;
+		border-radius: 0.92rem;
+	}
+
+	.project-title,
+	.project-bento:not(.is-filtered) .project-cell.is-hero-span .project-title {
+		font-size: 1.15rem;
+	}
+
+	.note-title {
+		font-size: 1.12rem;
+	}
+
+	.project-summary,
+	.note-excerpt {
+		font-size: 0.9rem;
+		line-height: 1.68;
+	}
+
+	.card-ext-btn {
+		min-height: 1.95rem;
+		padding: 0.22rem 0.65rem;
+		font-size: 0.73rem;
+	}
+
+	.chip,
+	.tag {
+		padding: 0.18rem 0.52rem;
+	}
+
+	/* Detail Page Sheets & Action Bars */
+	.breadcrumb {
+		margin-bottom: 0.9rem;
+	}
+
+	.project-sheet,
+	.paper-sheet {
+		padding: 1.15rem 1.08rem;
+		border-radius: 0.95rem;
+	}
+
+	.project-sheet {
+		margin-bottom: 1.5rem;
+	}
+
+	.sheet-summary {
+		font-size: 0.94rem;
+		line-height: 1.72;
+	}
+
+	.sheet-meta-bar {
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.85rem;
+	}
+
+	.sheet-actions {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+		gap: 0.5rem;
+	}
+
+	.sheet-actions a {
+		width: 100%;
+		min-height: 2.55rem;
+	}
+
+	.article-standfirst {
+		padding: 0.78rem 0.95rem;
+		font-size: 0.92rem;
+		line-height: 1.72;
+	}
+
+	.linked-project-card {
+		padding: 1.05rem 1.08rem;
+	}
+
+	.linked-project-actions {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+		gap: 0.5rem;
+	}
+
+	.linked-project-actions a {
+		width: 100%;
+		min-height: 2.5rem;
+	}
+
+	.empty-state-sheet {
+		padding: 1.6rem 1.2rem;
 	}
 }
 

@@ -88,6 +88,9 @@ const filters = [...statusOrder, ...stackItems];
 				const active = (btn.dataset.filterBtn ?? '') === clean;
 				btn.classList.toggle('is-active', active);
 				btn.setAttribute('aria-pressed', String(active));
+				if (active && pushUrl) {
+					btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+				}
 			});
 
 			if (pushUrl) {

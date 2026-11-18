@@ -78,6 +78,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		let running = false;
 		let downX = 0;
 		let downY = 0;
+		let pointerKind = 'mouse';
 
 		const ease = (t: number) => {
 			switch (configRef.current.easing) {
@@ -148,13 +149,14 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		spawnRef.current = spawn;
 
 		const onPointerDown = (event: PointerEvent) => {
-			if (event.button !== 0) return;
+			pointerKind = event.pointerType;
+			if (event.button !== 0 || event.pointerType === 'touch') return;
 			downX = event.clientX;
 			downY = event.clientY;
 		};
 
 		const onClick = (event: MouseEvent) => {
-			if (event.detail === 0) return;
+			if (event.detail === 0 || pointerKind === 'touch') return;
 			if (Math.hypot(event.clientX - downX, event.clientY - downY) > 6) return;
 			const selection = window.getSelection();
 			if (selection && selection.toString().length > 0) return;
