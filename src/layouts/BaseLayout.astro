@@ -1,12 +1,11 @@
 ---
 import '../styles/global.css';
 import '../styles/upgrade.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import SideNav from '../components/SideNav.astro';
 import AuroraBackground from '../components/AuroraBackground';
 import SiteClickSpark from '../components/SiteClickSpark';
-import StarTrail from '../components/bits/StarTrail';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 import { pageIdFromPath } from '../lib/page';
 import { withBase } from '../lib/paths';
@@ -15,9 +14,10 @@ interface Props {
 	title?: string;
 	description?: string;
 	noindex?: boolean;
+	readingProgress?: boolean;
 }
 
-const { title, description = SITE_DESCRIPTION, noindex = false } = Astro.props;
+const { title, description = SITE_DESCRIPTION, noindex = false, readingProgress = false } = Astro.props;
 const pageTitle = title ? `${title} · ${SITE_TITLE}` : SITE_TITLE;
 const page = pageIdFromPath(Astro.url.pathname);
 const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : Astro.url.href;
@@ -30,19 +30,30 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 		<script is:inline>
 			(function () {
 				var KEY = 'meng-lab-theme';
-				var pref = localStorage.getItem(KEY) || 'light';
-				if (pref !== 'light' && pref !== 'dark' && pref !== 'system') pref = 'light';
-				var theme =
-					pref === 'system'
-						? window.matchMedia('(prefers-color-scheme: dark)').matches
-							? 'dark'
-							: 'light'
-						: pref;
-				document.documentElement.dataset.theme = theme;
-				document.documentElement.dataset.themePref = pref;
-				document.documentElement.style.colorScheme = theme;
+				function readTheme() {
+					var pref = localStorage.getItem(KEY) || 'light';
+					if (pref !== 'light' && pref !== 'dark' && pref !== 'system') pref = 'light';
+					var theme =
+						pref === 'system'
+							? window.matchMedia('(prefers-color-scheme: dark)').matches
+								? 'dark'
+								: 'light'
+							: pref;
+					return { pref: pref, theme: theme };
+				}
+				function paint(doc) {
+					var state = readTheme();
+					doc.documentElement.dataset.theme = state.theme;
+					doc.documentElement.dataset.themePref = state.pref;
+					doc.documentElement.style.colorScheme = state.theme;
+				}
+				paint(document);
+				document.addEventListener('astro:before-swap', function (event) {
+					paint(event.newDocument);
+				});
 			})();
 		</script>
+		<ClientRouter />
 		<link rel="icon" href={withBase('/favicon.ico')} sizes="any" />
 		<link rel="icon" type="image/png" href={withBase('/favicon.png')} sizes="64x64" />
 		<link rel="apple-touch-icon" href={withBase('/apple-touch-icon.png')} />
@@ -60,20 +71,101 @@ const canonical = Astro.site ? new URL(Astro.url.pathname, Astro.site).href : As
 	</head>
 	<body data-page={page}>
 		<div class="site-shell">
-			<AuroraBackground client:idle />
-			<StarTrail client:idle />
-			<SiteClickSpark client:idle />
-			<Header />
-			<div class="site-frame">
-				<aside class="site-aside side-aside">
-					<SideNav />
-				</aside>
-				<main class="wrap">
-					<slot />
-				</main>
-				<slot name="rail" />
-			</div>
+			<AuroraBackground client:idle transition:persist="aurora" />
+			<SiteClickSpark client:idle transition:persist="spark" />
+			<Header readingProgress={readingProgress} />
+			<main class="wrap site-main">
+				<slot />
+			</main>
 			<Footer />
 		</div>
+		<script>
+			function setupCodeCopy() {
+				const blocks = document.querySelectorAll<HTMLPreElement>('.prose pre');
+				blocks.forEach((pre) => {
+					if (pre.dataset.copyReady === 'true') return;
+					pre.dataset.copyReady = 'true';
+
+					const wrapper = document.createElement('div');
+					wrapper.className = 'code-block-wrap';
+					pre.parentNode?.insertBefore(wrapper, pre);
+					wrapper.appendChild(pre);
+
+					const lang = pre.getAttribute('data-language');
+					if (lang && lang !== 'plaintext' && lang !== 'text') {
+						const badge = document.createElement('span');
+						badge.className = 'code-lang-badge';
+						badge.textContent = lang;
+						wrapper.appendChild(badge);
+					}
+
+					const btn = document.createElement('button');
+					btn.type = 'button';
+					btn.className = 'code-copy-btn';
+					btn.setAttribute('aria-label', '复制代码');
+					btn.textContent = '复制';
+
+					let resetTimer = 0;
+					btn.addEventListener('click', async () => {
+						const code = pre.querySelector('code')?.innerText ?? pre.innerText;
+						try {
+							await navigator.clipboard.writeText(code);
+							btn.textContent = '已复制 ✓';
+							btn.classList.add('is-copied');
+							window.clearTimeout(resetTimer);
+							resetTimer = window.setTimeout(() => {
+								btn.textContent = '复制';
+								btn.classList.remove('is-copied');
+							}, 1800);
+						} catch {
+							btn.textContent = '复制失败';
+						}
+					});
+
+					wrapper.appendChild(btn);
+				});
+			}
+
+			let cleanupScroll: (() => void) | null = null;
+
+			function setupReadingProgress() {
+				cleanupScroll?.();
+				cleanupScroll = null;
+				const bar = document.querySelector<HTMLElement>('.reading-progress-bar');
+				const article = document.querySelector<HTMLElement>('.article-prose');
+				if (!bar || !article) return;
+
+				let ticking = false;
+				const update = () => {
+					ticking = false;
+					const rect = article.getBoundingClientRect();
+					const viewH = window.innerHeight;
+					const total = Math.max(1, article.offsetHeight - viewH * 0.55);
+					const passed = Math.min(total, Math.max(0, -rect.top + viewH * 0.2));
+					const ratio = Math.max(0, Math.min(1, passed / total));
+					bar.style.transform = `scaleX(${ratio.toFixed(4)})`;
+				};
+
+				const onScroll = () => {
+					if (!ticking) {
+						ticking = true;
+						requestAnimationFrame(update);
+					}
+				};
+
+				update();
+				window.addEventListener('scroll', onScroll, { passive: true });
+				window.addEventListener('resize', onScroll, { passive: true });
+				cleanupScroll = () => {
+					window.removeEventListener('scroll', onScroll);
+					window.removeEventListener('resize', onScroll);
+				};
+			}
+
+			document.addEventListener('astro:page-load', () => {
+				setupCodeCopy();
+				setupReadingProgress();
+			});
+		</script>
 	</body>
 </html>

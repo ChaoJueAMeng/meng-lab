@@ -10,7 +10,7 @@ export default function AuroraBackground() {
 	const theme = useTheme();
 	const [on, setOn] = useState(false);
 	const colorStops =
-		theme === 'dark' ? ['#c45c26', '#e8a06a', '#8b3d1a'] : ['#e8a06a', '#c45c26', '#f3d2b3'];
+		theme === 'dark' ? ['#8b3d1a', '#c45c26', '#4a2816'] : ['#f3d2b3', '#df9b6d', '#f6e7d4'];
 
 	useEffect(() => {
 		const sync = () => setOn(effectsAllowed());
@@ -26,7 +26,7 @@ export default function AuroraBackground() {
 
 	return (
 		<div className="aurora-layer" aria-hidden="true">
-			<Aurora colorStops={colorStops} amplitude={0.85} blend={0.55} speed={0.55} />
+			<Aurora colorStops={colorStops} amplitude={0.55} blend={0.62} speed={0.35} />
 		</div>
 	);
 }

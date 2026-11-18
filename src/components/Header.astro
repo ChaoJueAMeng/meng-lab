@@ -1,22 +1,27 @@
 ---
 import { NAV_ITEMS, isCurrent } from '../lib/nav';
 import { stripBase, withBase } from '../lib/paths';
-import BrandMagnet from './BrandMagnet';
 import ThemeToggle from './ThemeToggle';
 
+interface Props {
+	readingProgress?: boolean;
+}
+
+const { readingProgress = false } = Astro.props;
 const path = stripBase(Astro.url.pathname);
 ---
 
 <header class="site-header">
-	<div class="wrap">
-		<BrandMagnet client:idle>
-			<a class="brand" href={withBase('/')}>
-				<span class="brand-mark">
-					<img src={withBase('/apple-touch-icon.png')} alt="" width="27" height="27" />
-				</span>
-				阿萌的实验室
-			</a>
-		</BrandMagnet>
+	<div class="wrap header-inner">
+		<a class="brand" href={withBase('/')}>
+			<span class="brand-mark">
+				<img src={withBase('/apple-touch-icon.png')} alt="" width="28" height="28" />
+			</span>
+			<span class="brand-text">
+				<span class="brand-name">阿萌的实验室</span>
+				<span class="brand-sub">FIELD NOTES</span>
+			</span>
+		</a>
 		<div class="header-end">
 			<nav class="nav" aria-label="主导航">
 				{
@@ -30,4 +35,11 @@ const path = stripBase(Astro.url.pathname);
 			<ThemeToggle client:load />
 		</div>
 	</div>
+	{
+		readingProgress && (
+			<div class="reading-progress" aria-hidden="true">
+				<span class="reading-progress-bar" />
+			</div>
+		)
+	}
 </header>

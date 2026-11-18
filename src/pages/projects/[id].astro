@@ -1,0 +1,157 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import {
+	estimateReadingMinutes,
+	formatDate,
+	formatSerial,
+	getNotes,
+	getProjectLinks,
+	getProjects,
+	getStatusTone,
+} from '../../lib/content';
+import { withBase } from '../../lib/paths';
+
+export async function getStaticPaths() {
+	const projects = await getProjects();
+	return projects.map((project, index) => ({
+		params: { id: project.id },
+		props: {
+			project,
+			index,
+			prev: index > 0 ? projects[index - 1] : null,
+			next: index < projects.length - 1 ? projects[index + 1] : null,
+		},
+	}));
+}
+
+const { project, index, prev, next } = Astro.props;
+const { Content, headings } = await render(project);
+const tone = getStatusTone(project.data.status);
+const links = getProjectLinks(project);
+const readme = project.data.readme;
+const hasToc = headings.filter((h) => h.depth === 2 || h.depth === 3).length >= 2;
+
+const allNotes = await getNotes();
+const relatedNotes = allNotes.filter((n) => (n.data.project ?? n.id) === project.id);
+---
+
+<BaseLayout title={project.data.title} description={project.data.summary} readingProgress>
+	<nav class="breadcrumb" aria-label="面包屑">
+		<a href={withBase('/projects')}>
+			<span aria-hidden="true">←</span> 全部作品档案
+		</a>
+	</nav>
+
+	<header class="project-sheet">
+		<div class="project-sheet-top">
+			<span class="serial-no">{formatSerial(index)}</span>
+			<span class="status-pill" data-tone={tone}>
+				<span class="status-dot" aria-hidden="true" />
+				{project.data.status}
+			</span>
+			<span class="sheet-provenance">
+				{
+					readme === 'private'
+						? '私有仓库 · 档案摘录'
+						: readme
+							? '开源仓库文档'
+							: '项目说明'
+				}
+			</span>
+		</div>
+
+		<h1 class="sheet-title">{project.data.title}</h1>
+		<p class="sheet-summary">{project.data.summary}</p>
+
+		<div class="sheet-meta-bar">
+			<div class="tags">
+				{
+					project.data.stack.map((tech) => (
+						<a class="chip chip-link" href={withBase(`/projects?tag=${encodeURIComponent(tech)}`)}>
+							{tech}
+						</a>
+					))
+				}
+			</div>
+
+			<div class="sheet-actions">
+				{
+					links.primary && (
+						<a class="btn-primary btn-sm" href={links.primary.url} target="_blank" rel="noopener">
+							{links.primary.label}
+							<span aria-hidden="true">↗</span>
+						</a>
+					)
+				}
+				{
+					links.secondary && (
+						<a class="btn-paper btn-sm" href={links.secondary.url} target="_blank" rel="noopener">
+							{links.secondary.label}
+							<span aria-hidden="true">↗</span>
+						</a>
+					)
+				}
+				{
+					readme && readme !== 'private' && !links.secondary && links.primary?.kind !== 'github' && (
+						<a class="btn-paper btn-sm" href={readme} target="_blank" rel="noopener">
+							原版 README ↗
+						</a>
+					)
+				}
+			</div>
+		</div>
+	</header>
+
+	<div class:list={['article-layout', { 'has-toc': hasToc }]}>
+		<div class="prose article-prose project-prose">
+			<Content />
+		</div>
+		<TableOfContents headings={headings} />
+	</div>
+
+	{
+		relatedNotes.length > 0 && (
+			<section class="related-block" aria-label="关联工程手记">
+				<p class="related-heading">FIELD NOTES · 关联工程手记</p>
+				<div class="related-list">
+					{relatedNotes.map((note) => (
+						<a class="related-card" href={withBase(`/notes/${note.id}`)}>
+							<div class="related-card-meta">
+								<time datetime={note.data.pubDate.toISOString()}>{formatDate(note.data.pubDate)}</time>
+								<span>· 约 {estimateReadingMinutes(note.body)} 分钟</span>
+							</div>
+							<strong>
+								{note.data.title}
+								<span class="arrow-cue" aria-hidden="true">→</span>
+							</strong>
+							<p>{note.data.description}</p>
+						</a>
+					))}
+				</div>
+			</section>
+		)
+	}
+
+	{
+		(prev || next) && (
+			<nav class="entry-pager" aria-label="相邻作品导航">
+				{prev ? (
+					<a class="pager-card" href={withBase(`/projects/${prev.id}`)}>
+						<span class="pager-label">← 上一个作品</span>
+						<strong>{prev.data.title}</strong>
+					</a>
+				) : (
+					<div />
+				)}
+				{next && (
+					<a class="pager-card is-next" href={withBase(`/projects/${next.id}`)}>
+						<span class="pager-label">下一个作品 →</span>
+						<strong>{next.data.title}</strong>
+					</a>
+				)}
+			</nav>
+		)
+	}
+</BaseLayout>

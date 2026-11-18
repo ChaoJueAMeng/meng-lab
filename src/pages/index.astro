@@ -1,48 +1,72 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LabDesk from '../components/LabDesk.astro';
 import NoteList from '../components/NoteList.astro';
 import ProjectList from '../components/ProjectList.astro';
-import Widgets from '../components/Widgets.astro';
-import HeroHeading from '../components/HeroHeading';
-import HeroKicker from '../components/HeroKicker';
-import ShinyLabel from '../components/ShinyLabel';
 import { getNotes, getProjects } from '../lib/content';
+import { GITHUB_URL } from '../consts';
 import { withBase } from '../lib/paths';
 
-const notes = (await getNotes()).slice(0, 3);
-const projects = (await getProjects()).slice(0, 5);
+const allNotes = await getNotes();
+const allProjects = await getProjects();
+const notes = allNotes.slice(0, 3);
+const projects = allProjects.slice(0, 5);
 ---
 
 <BaseLayout>
-	<section class="hero">
-		<HeroKicker client:visible text="meng-lab" />
-		<h1 class="visually-hidden">把做过的事记下来。</h1>
-		<HeroHeading client:visible text="把做过的事记下来。" />
-		<p class="lede">
-			阿萌的工程手记。外卖、聊天、小工具、Harness ——把过程、心得和踩过的坑都写在这里。
-		</p>
+	<section class="hero-grid">
+		<div class="hero-copy">
+			<p class="journal-kicker">
+				<span class="kicker-stamp">MENG-LAB</span>
+				<span class="kicker-sep">/</span>
+				<span>阿萌的工程手记</span>
+			</p>
+			<h1 class="hero-title">把做过的事记下来。</h1>
+			<p class="lede">
+				外卖系统、即时聊天、桌面悬浮工具、Coding Agent Runtime ——
+				把能跑起来的东西、做取舍的理由，以及当时怎么翻的车都记在这本手记里。
+			</p>
+			<div class="hero-actions">
+				<a class="btn-primary" href={withBase('/projects')}>
+					浏览作品档案
+					<span aria-hidden="true">→</span>
+				</a>
+				<a class="btn-paper" href={withBase('/notes')}>
+					阅读工程手记
+				</a>
+				<a class="btn-ghost" href={GITHUB_URL} target="_blank" rel="noopener">
+					GitHub ↗
+				</a>
+			</div>
+		</div>
+		<LabDesk />
 	</section>
 
 	<section class="section" id="works">
 		<div class="section-head">
-			<h2>作品</h2>
-			<a class="more" href={withBase('/projects')}>
-				<ShinyLabel client:visible text="全部作品" />
+			<div class="section-title-group">
+				<span class="section-index">01 / WORKS</span>
+				<h2>精选作品</h2>
+			</div>
+			<a class="more-link" href={withBase('/projects')}>
+				全部 {allProjects.length} 个项目
+				<span class="arrow-cue" aria-hidden="true">→</span>
 			</a>
 		</div>
-		<ProjectList projects={projects} />
+		<ProjectList projects={projects} bento />
 	</section>
 
 	<section class="section" id="recent-notes">
 		<div class="section-head">
-			<h2>最近笔记</h2>
-			<a class="more" href={withBase('/notes')}>
-				<ShinyLabel client:visible text="全部笔记" />
+			<div class="section-title-group">
+				<span class="section-index">02 / FIELD NOTES</span>
+				<h2>最近手记</h2>
+			</div>
+			<a class="more-link" href={withBase('/notes')}>
+				全部 {allNotes.length} 篇手记
+				<span class="arrow-cue" aria-hidden="true">→</span>
 			</a>
 		</div>
-		<NoteList notes={notes} />
+		<NoteList notes={notes} totalCount={allNotes.length} />
 	</section>
-	<div slot="rail" class="home-widgets">
-		<Widgets />
-	</div>
 </BaseLayout>

@@ -1,41 +1,105 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { formatSerial, getNotes, getProjectLinks, getStatusTone } from '../lib/content';
 import { withBase } from '../lib/paths';
 import ProjectCard from './ProjectCard';
 
 interface Props {
 	projects: CollectionEntry<'projects'>[];
+	bento?: boolean;
 }
 
-const { projects } = Astro.props;
+const { projects, bento = true } = Astro.props;
+const allNotes = await getNotes();
+
+const noteCountByProject = new Map<string, number>();
+for (const note of allNotes) {
+	const pid = note.data.project ?? note.id;
+	noteCountByProject.set(pid, (noteCountByProject.get(pid) ?? 0) + 1);
+}
 ---
 
-<ol class="project-list">
+<ol class:list={['project-list', { 'project-bento': bento }]}>
 	{
-		projects.map((project) => (
-			<li>
-				<ProjectCard client:visible>
-					<div class="project-item">
-						<h3>
-							{project.data.href ? (
-								<a class="stretch-link" href={withBase(`/projects/${project.id}/go`)}>
-									<span class="stretch-label">{project.data.title}</span>
-								</a>
-							) : (
-								project.data.title
-							)}
-							<span class="project-status">{project.data.status}</span>
-							{!project.data.href && <span class="private-badge">私有</span>}
-						</h3>
-						<p>{project.data.summary}</p>
-						<div class="tags">
-							{project.data.stack.map((item) => (
-								<span class="chip">{item}</span>
-							))}
-						</div>
-					</div>
-				</ProjectCard>
-			</li>
-		))
+		projects.map((project, index) => {
+			const tone = getStatusTone(project.data.status);
+			const links = getProjectLinks(project);
+			const noteCount = noteCountByProject.get(project.id) ?? 0;
+			const isHeroSpan = bento && index === 0;
+			const isFeatured = project.data.featured || index < 2;
+			const tokens = [project.data.status, ...project.data.stack].join('|');
+
+			return (
+				<li
+					class:list={[
+						'project-cell',
+						{ 'is-hero-span': isHeroSpan, 'is-featured': isFeatured },
+					]}
+					data-tokens={tokens}
+				>
+					<ProjectCard client:visible featured={isFeatured}>
+						<article class="project-item">
+							<div class="project-card-head">
+								<div class="project-head-left">
+									<span class="serial-no">{formatSerial(index)}</span>
+									<span class="status-pill" data-tone={tone}>
+										<span class="status-dot" aria-hidden="true" />
+										{project.data.status}
+									</span>
+									{project.data.readme === 'private' && !project.data.href && (
+										<span class="private-badge">私有仓库</span>
+									)}
+								</div>
+								{links.primary && (
+									<a
+										class="card-ext-btn"
+										href={links.primary.url}
+										target="_blank"
+										rel="noopener"
+										title={links.primary.label}
+									>
+										{links.primary.shortLabel}
+										<span aria-hidden="true">↗</span>
+									</a>
+								)}
+							</div>
+
+							<div class="project-card-body">
+								<h3 class="project-title">
+									<a class="stretch-link" href={withBase(`/projects/${project.id}`)}>
+										<span class="stretch-label">{project.data.title}</span>
+									</a>
+								</h3>
+								<p class="project-summary">{project.data.summary}</p>
+							</div>
+
+							<div class="project-card-foot">
+								<div class="tags">
+									{project.data.stack.map((item) => (
+										<a
+											class="chip chip-link"
+											data-tag-trigger={item}
+											href={withBase(`/projects?tag=${encodeURIComponent(item)}`)}
+										>
+											{item}
+										</a>
+									))}
+								</div>
+								<div class="project-foot-meta">
+									{noteCount > 0 && (
+										<span class="linked-note-pill" title="配有工程踩坑手记">
+											手记 ×{noteCount}
+										</span>
+									)}
+									<span class="card-more-cue" aria-hidden="true">
+										详情 <span class="arrow-cue">→</span>
+									</span>
+								</div>
+							</div>
+						</article>
+					</ProjectCard>
+				</li>
+			);
+		})
 	}
 </ol>

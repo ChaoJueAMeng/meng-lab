@@ -1,7 +1,7 @@
 export const NAV_ITEMS = [
 	{ href: '/', label: '主页' },
-	{ href: '/notes', label: '笔记' },
 	{ href: '/projects', label: '作品' },
+	{ href: '/notes', label: '笔记' },
 	{ href: '/about', label: '关于' },
 ] as const;
 

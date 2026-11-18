@@ -28,19 +28,16 @@ export default function ClockCard() {
 				second: '2-digit',
 				hourCycle: 'h23',
 			}).format(now)
-		: '––:––:––';
-	const date = now
-		? new Intl.DateTimeFormat('zh-CN', {
-				timeZone: 'Asia/Shanghai',
-				dateStyle: 'full',
-			}).format(now)
-		: '上海时间';
+		: '00:00:00';
 
 	return (
-		<section className="widget-card clock-card" aria-label="当前日期和时间">
-			<p className="widget-kicker">现在</p>
-			<p className="clock-time">{time}</p>
-			<p className="clock-date">{date}</p>
-		</section>
+		<span
+			className={`lab-clock ${now ? 'is-ready' : 'is-pending'}`}
+			title="上海时间 (UTC+8)"
+			aria-label={now ? `上海时间 ${time}` : '上海时间'}
+		>
+			<span className="lab-clock-zone">UTC+8</span>
+			<time className="lab-clock-digits">{time}</time>
+		</span>
 	);
 }

@@ -1,0 +1,74 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const items = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+{
+	items.length >= 2 && (
+		<aside class="toc-rail" aria-label="章节目录">
+			<nav class="toc-card">
+				<p class="toc-title">CONTENTS · 目录</p>
+				<ol class="toc-list">
+					{items.map((item) => (
+						<li class:list={['toc-item', { 'is-sub': item.depth === 3 }]}>
+							<a href={`#${item.slug}`} data-toc-link={item.slug}>
+								{item.text}
+							</a>
+						</li>
+					))}
+				</ol>
+			</nav>
+		</aside>
+	)
+}
+
+<script>
+	let cleanupToc: (() => void) | null = null;
+
+	function initToc() {
+		cleanupToc?.();
+		cleanupToc = null;
+		const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+		if (links.length === 0) return;
+
+		const targets = links
+			.map((link) => {
+				const id = link.dataset.tocLink;
+				return id ? document.getElementById(id) : null;
+			})
+			.filter((el): el is HTMLElement => Boolean(el));
+
+		if (targets.length === 0) return;
+
+		const setActive = (id: string) => {
+			links.forEach((link) => {
+				link.classList.toggle('is-active', link.dataset.tocLink === id);
+			});
+		};
+
+		setActive(targets[0].id);
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				const visible = entries
+					.filter((e) => e.isIntersecting)
+					.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+				if (visible.length > 0) {
+					setActive((visible[0].target as HTMLElement).id);
+				}
+			},
+			{ rootMargin: '-84px 0px -68% 0px', threshold: [0, 1] },
+		);
+
+		targets.forEach((el) => observer.observe(el));
+		cleanupToc = () => observer.disconnect();
+	}
+
+	document.addEventListener('astro:page-load', initToc);
+</script>

@@ -9,6 +9,7 @@ const notes = defineCollection({
 		description: z.string(),
 		pubDate: z.coerce.date(),
 		tags: z.array(z.string()).default([]),
+		project: z.string().optional(),
 	}),
 });
 
@@ -22,6 +23,7 @@ const projects = defineCollection({
 		readme: z.union([z.string().url(), z.literal('private')]).optional(),
 		status: z.string(),
 		order: z.number().default(0),
+		featured: z.boolean().default(false),
 	}),
 });
 

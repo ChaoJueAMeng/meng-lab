@@ -1,19 +1,111 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NoteList from '../../components/NoteList.astro';
-import HeroHeading from '../../components/HeroHeading';
-import HeroKicker from '../../components/HeroKicker';
 import { getNotes } from '../../lib/content';
 
 const notes = await getNotes();
+
+const tagCounts = new Map<string, number>();
+for (const note of notes) {
+	for (const tag of note.data.tags) {
+		tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+	}
+}
+const tags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh'));
 ---
 
-<BaseLayout title="笔记" description="上线实录、Cloudflare、Agent 和全栈踩坑。">
-	<HeroKicker client:visible text="Notes" />
-	<h1 class="visually-hidden">笔记</h1>
-	<HeroHeading client:visible className="page-title" text="笔记" />
-	<p class="page-desc">记下一些实际遇到的问题，以及我的心得体会。</p>
-	<div class="section" id="recent-notes">
-		<NoteList notes={notes} />
+<BaseLayout title="工程手记" description="上线实录、Cloudflare、Coding Agent 边界与全栈踩坑记录。">
+	<header class="archive-header">
+		<p class="journal-kicker">
+			<span class="kicker-stamp">JOURNAL · 02</span>
+			<span class="kicker-sep">/</span>
+			<span>FIELD NOTES</span>
+		</p>
+		<h1 class="page-title">工程手记</h1>
+		<p class="page-desc">记下做项目时撞上的真问题、取舍过程，以及事后回头看最值得留下来的一句话。</p>
+
+		{
+			tags.length > 0 && (
+				<div class="filter-bar" role="toolbar" aria-label="按话题筛选笔记" data-filter-root="notes">
+					<button type="button" class="filter-pill is-active" data-filter-btn="" aria-pressed="true">
+						全部
+						<span class="filter-count">{notes.length}</span>
+					</button>
+					{tags.map(([tag, count]) => (
+						<button type="button" class="filter-pill" data-filter-btn={tag} aria-pressed="false">
+							#{tag}
+							<span class="filter-count">{count}</span>
+						</button>
+					))}
+				</div>
+			)
+		}
+	</header>
+
+	<div class="section archive-body" id="recent-notes" data-filter-scope="notes">
+		<NoteList notes={notes} totalCount={notes.length} />
+		<div class="filter-empty" hidden>
+			<p>暂时没有该话题下的手记。</p>
+			<button type="button" class="btn-paper" data-filter-reset>显示全部手记</button>
+		</div>
 	</div>
 </BaseLayout>
+
+<script>
+	function setupNoteFilter() {
+		const bar = document.querySelector<HTMLElement>('[data-filter-root="notes"]');
+		const scope = document.querySelector<HTMLElement>('[data-filter-scope="notes"]');
+		if (!bar || !scope || bar.dataset.bound === 'true') return;
+		bar.dataset.bound = 'true';
+
+		const cells = Array.from(scope.querySelectorAll<HTMLElement>('.note-cell'));
+		const buttons = Array.from(bar.querySelectorAll<HTMLButtonElement>('[data-filter-btn]'));
+		const empty = scope.querySelector<HTMLElement>('.filter-empty');
+		const resetBtn = scope.querySelector<HTMLButtonElement>('[data-filter-reset]');
+
+		const apply = (tag: string, pushUrl = true) => {
+			const clean = tag.trim().replace(/^#/, '');
+			let shown = 0;
+
+			cells.forEach((cell) => {
+				const tokens = (cell.dataset.tokens ?? '').split('|').filter(Boolean);
+				const match = !clean || tokens.includes(clean);
+				cell.hidden = !match;
+				if (match) shown++;
+			});
+
+			if (empty) empty.hidden = shown > 0;
+
+			buttons.forEach((btn) => {
+				const active = (btn.dataset.filterBtn ?? '') === clean;
+				btn.classList.toggle('is-active', active);
+				btn.setAttribute('aria-pressed', String(active));
+			});
+
+			if (pushUrl) {
+				const url = new URL(window.location.href);
+				if (clean) url.searchParams.set('tag', clean);
+				else url.searchParams.delete('tag');
+				window.history.replaceState({}, '', url);
+			}
+		};
+
+		buttons.forEach((btn) => {
+			btn.addEventListener('click', () => apply(btn.dataset.filterBtn ?? ''));
+		});
+
+		scope.querySelectorAll<HTMLAnchorElement>('[data-tag-trigger]').forEach((chip) => {
+			chip.addEventListener('click', (event) => {
+				event.preventDefault();
+				apply(chip.dataset.tagTrigger ?? '');
+			});
+		});
+
+		resetBtn?.addEventListener('click', () => apply(''));
+
+		const initial = new URLSearchParams(window.location.search).get('tag') ?? '';
+		if (initial) apply(initial, false);
+	}
+
+	document.addEventListener('astro:page-load', setupNoteFilter);
+</script>

@@ -5,6 +5,7 @@ pubDate: 2026-09-20
 tags:
   - Agent
   - Java
+project: m-harness
 ---
 
 本地 Coding Agent 一旦能改文件、跑命令，怕的不是它写错一行，是你不知道它改了什么，以及它会不会被眼前这个仓库带着走。

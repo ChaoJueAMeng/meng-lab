@@ -5,6 +5,7 @@ pubDate: 2026-08-29
 tags:
   - Agent
   - 全栈
+project: notiask
 ---
 
 手机上问 AI，摩擦往往不在模型，而在「打开哪个 App」。

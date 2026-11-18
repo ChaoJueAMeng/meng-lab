@@ -1,40 +1,74 @@
 ---
-import { formatDate } from '../lib/content';
-import { withBase } from '../lib/paths';
 import type { CollectionEntry } from 'astro:content';
-import NoteCard from './NoteCard';
+import { estimateReadingMinutes, formatDate, getProjects } from '../lib/content';
+import { withBase } from '../lib/paths';
 
 interface Props {
 	notes: CollectionEntry<'notes'>[];
+	totalCount?: number;
 }
 
-const { notes } = Astro.props;
+const { notes, totalCount = notes.length } = Astro.props;
+const allProjects = await getProjects();
+const projectById = new Map(allProjects.map((p) => [p.id, p]));
 ---
 
 <ol class="note-list">
 	{
-		notes.map((note) => (
-			<li>
-				<NoteCard client:visible>
-					<div class="note-item">
-						<time class="note-date" datetime={note.data.pubDate.toISOString()}>
-							{formatDate(note.data.pubDate)}
-						</time>
-						<div>
-							<a class="stretch-link" href={withBase(`/notes/${note.id}`)}>
-								<span class="stretch-label">{note.data.title}</span>
-							</a>
-							{note.data.tags.length > 0 && (
+		notes.map((note, index) => {
+			const minutes = estimateReadingMinutes(note.body);
+			const linkedProject = note.data.project ? projectById.get(note.data.project) : projectById.get(note.id);
+			const noteNo = String(Math.max(1, totalCount - index)).padStart(2, '0');
+			const tokens = note.data.tags.join('|');
+
+			return (
+				<li class="note-cell" data-tokens={tokens}>
+					<article class="note-journal-card">
+						<div class="note-aside-meta">
+							<span class="note-serial">NOTE #{noteNo}</span>
+							<time class="note-date" datetime={note.data.pubDate.toISOString()}>
+								{formatDate(note.data.pubDate)}
+							</time>
+							<span class="note-readtime">约 {minutes} 分钟</span>
+						</div>
+
+						<div class="note-main-body">
+							<h3 class="note-title">
+								<a class="stretch-link" href={withBase(`/notes/${note.id}`)}>
+									<span class="stretch-label">{note.data.title}</span>
+								</a>
+							</h3>
+							<p class="note-excerpt">{note.data.description}</p>
+
+							<div class="note-foot">
 								<div class="tags">
 									{note.data.tags.map((tag) => (
-										<span class="tag">{tag}</span>
+										<a
+											class="tag tag-link"
+											data-tag-trigger={tag}
+											href={withBase(`/notes?tag=${encodeURIComponent(tag)}`)}
+										>
+											#{tag}
+										</a>
 									))}
+									{linkedProject && (
+										<a
+											class="note-project-badge"
+											href={withBase(`/projects/${linkedProject.id}`)}
+											title={`查看关联项目：${linkedProject.data.title}`}
+										>
+											关联作品：{linkedProject.data.title} ↗
+										</a>
+									)}
 								</div>
-							)}
+								<span class="card-more-cue" aria-hidden="true">
+									阅读全文 <span class="arrow-cue">→</span>
+								</span>
+							</div>
 						</div>
-					</div>
-				</NoteCard>
-			</li>
-		))
+					</article>
+				</li>
+			);
+		})
 	}
 </ol>

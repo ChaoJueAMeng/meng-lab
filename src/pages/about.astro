@@ -1,28 +1,107 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroHeading from '../components/HeroHeading';
-import HeroKicker from '../components/HeroKicker';
 import { GITHUB_REPO, GITHUB_URL } from '../consts';
+import { withBase } from '../lib/paths';
 ---
 
-<BaseLayout title="关于" description="我是阿萌。这里记做过的项目，和当时怎么翻的车。">
-	<HeroKicker client:visible text="About" />
-	<h1 class="visually-hidden">关于</h1>
-	<HeroHeading client:visible className="page-title" text="关于" />
-	<div class="about">
-		<p>
-			我是阿萌，GitHub 账号是 <a href={GITHUB_URL}>ChaoJueAMeng</a>。
+<BaseLayout title="关于" description="我是阿萌。这里记录做过的项目、技术选型，和当时怎么翻的车。">
+	<header class="archive-header">
+		<p class="journal-kicker">
+			<span class="kicker-stamp">PROFILE · 03</span>
+			<span class="kicker-sep">/</span>
+			<span>ABOUT & COLOPHON</span>
 		</p>
-		<p>
-			苍穹外卖和 PulseChat 已经部署上线。
-			NotiAsk 和 M-harness，是用来练手和自用的。
-		</p>
-		<p>
-			Java / Spring 最熟。Vue、JS、、Kotlin、C# 都在各个项目中接触过。
-			这个实验室是 Astro 静态站。
-		</p>
-		<p>
-			实验室页面仓库在 <a href={GITHUB_REPO}>meng-lab</a>。
-		</p>
+		<h1 class="page-title">关于阿萌与实验室</h1>
+		<p class="page-desc">相比只跑通一段演示 Demo，更在意东西上线、常驻或交付到真实场景后怎么稳住。</p>
+	</header>
+
+	<div class="about-grid">
+		<section class="paper-sheet about-bio">
+			<p class="sheet-kicker">AUTHOR · 自述</p>
+			<p class="about-lead">
+				我是阿萌，GitHub 账号是 <a href={GITHUB_URL} target="_blank" rel="noopener">@ChaoJueAMeng</a>。
+			</p>
+			<p>
+				<a href={withBase('/projects/cangqiong')}>苍穹外卖</a>{' '}和{' '}
+				<a href={withBase('/projects/pulsechat')}>PulseChat</a> 已经实打实部署运维过；
+				<a href={withBase('/projects/notiask')}>NotiAsk</a>、<a href={withBase('/projects/meng-meter')}>meng-meter</a>{' '}
+				和 <a href={withBase('/projects/m-harness')}>M-harness</a> 则是围绕自己日常痛点打磨的桌面、移动端与 Agent 工具。
+			</p>
+			<p>
+				主力最熟的是 <strong>Java / Spring</strong> 体系；Vue、JavaScript / TypeScript、Rust、Kotlin、C#
+				都在具体项目里落地过。建这个实验室，是为了把散落在各个仓库里的架构设计、配置边界和踩坑复盘收拢成册。
+			</p>
+		</section>
+
+		<aside class="paper-sheet about-colophon">
+			<p class="sheet-kicker">COLOPHON · 本站铭牌</p>
+			<dl class="colophon-list">
+				<div>
+					<dt>构建框架</dt>
+					<dd>Astro 静态生成 + ClientRouter 视图过渡</dd>
+				</div>
+				<div>
+					<dt>视觉风格</dt>
+					<dd>暖色宣纸底纹 · 陶土朱砂墨色 · 工程档案编号</dd>
+				</div>
+				<div>
+					<dt>部署边缘</dt>
+					<dd>Cloudflare Workers Static Assets / GitHub Pages</dd>
+				</div>
+				<div>
+					<dt>站点仓库</dt>
+					<dd>
+						<a href={GITHUB_REPO} target="_blank" rel="noopener">ChaoJueAMeng/meng-lab ↗</a>
+					</dd>
+				</div>
+			</dl>
+		</aside>
 	</div>
+
+	<section class="section">
+		<div class="section-head">
+			<div class="section-title-group">
+				<span class="section-index">STACK / FOCUS</span>
+				<h2>常驻技术栈与关注方向</h2>
+			</div>
+		</div>
+
+		<div class="stack-matrix">
+			<div class="paper-sheet stack-card">
+				<span class="serial-no">01 · BACKEND</span>
+				<h3>后端与业务工程</h3>
+				<p>偏爱清晰的模块边界与可观测运维，处理过延迟关单、WebSocket 推送、对象存储与证书链路。</p>
+				<div class="tags">
+					<span class="chip">Java</span>
+					<span class="chip">Spring Boot</span>
+					<span class="chip">MySQL / Redis</span>
+					<span class="chip">RabbitMQ</span>
+				</div>
+			</div>
+
+			<div class="paper-sheet stack-card">
+				<span class="serial-no">02 · CLIENT & DESKTOP</span>
+				<h3>原生端与轻量桌面工具</h3>
+				<p>追求「嵌进系统表面」的低摩擦体验——无论是通知栏直接提问，还是屏幕边缘常驻的内存柱。</p>
+				<div class="tags">
+					<span class="chip">Kotlin / Android</span>
+					<span class="chip">Rust / Tauri</span>
+					<span class="chip">WinUI 3 / C#</span>
+					<span class="chip">Vue / uni-app</span>
+				</div>
+			</div>
+
+			<div class="paper-sheet stack-card">
+				<span class="serial-no">03 · AGENT & EDGE</span>
+				<h3>Coding Agent 与边缘应用</h3>
+				<p>关注 Agent 在真实工作区里的权限守卫、快照回滚（Checkpoint）与不可信配置隔离。</p>
+				<div class="tags">
+					<span class="chip">Agent Runtime</span>
+					<span class="chip">LangChain4j</span>
+					<span class="chip">TypeScript</span>
+					<span class="chip">Cloudflare Workers</span>
+				</div>
+			</div>
+		</div>
+	</section>
 </BaseLayout>

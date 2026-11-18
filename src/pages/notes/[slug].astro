@@ -1,33 +1,143 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import HeroKicker from '../../components/HeroKicker';
-import { getNotes, formatDate } from '../../lib/content';
+import TableOfContents from '../../components/TableOfContents.astro';
+import {
+	estimateReadingMinutes,
+	formatDate,
+	getNotes,
+	getProjectLinks,
+	getProjects,
+	getStatusTone,
+} from '../../lib/content';
+import { withBase } from '../../lib/paths';
 
 export async function getStaticPaths() {
 	const notes = await getNotes();
-	return notes.map((note) => ({
+	return notes.map((note, index) => ({
 		params: { slug: note.id },
-		props: { note },
+		props: {
+			note,
+			noteNo: String(notes.length - index).padStart(2, '0'),
+			newer: index > 0 ? notes[index - 1] : null,
+			older: index < notes.length - 1 ? notes[index + 1] : null,
+		},
 	}));
 }
 
-const { note } = Astro.props;
-const { Content } = await render(note);
+const { note, noteNo, newer, older } = Astro.props;
+const { Content, headings } = await render(note);
+const minutes = estimateReadingMinutes(note.body);
+const hasToc = headings.filter((h) => h.depth === 2 || h.depth === 3).length >= 2;
+
+const projects = await getProjects();
+const targetProjectId = note.data.project ?? note.id;
+const linkedProject = projects.find((p) => p.id === targetProjectId);
+const projectLinks = linkedProject ? getProjectLinks(linkedProject) : undefined;
 ---
 
-<BaseLayout title={note.data.title} description={note.data.description}>
-	<article>
+<BaseLayout title={note.data.title} description={note.data.description} readingProgress>
+	<nav class="breadcrumb" aria-label="面包屑">
+		<a href={withBase('/notes')}>
+			<span aria-hidden="true">←</span> 全部工程手记
+		</a>
+	</nav>
+
+	<article class="note-article">
 		<header class="article-header">
-			<HeroKicker client:visible text="Note" />
-			<p class="note-meta">
+			<div class="article-meta-row">
+				<span class="note-serial">NOTE #{noteNo}</span>
+				<span class="meta-dot">·</span>
 				<time datetime={note.data.pubDate.toISOString()}>{formatDate(note.data.pubDate)}</time>
-				{note.data.tags.length > 0 && ` · ${note.data.tags.join(' / ')}`}
-			</p>
-			<h1>{note.data.title}</h1>
+				<span class="meta-dot">·</span>
+				<span>约 {minutes} 分钟阅读</span>
+			</div>
+
+			<h1 class="article-main-title">{note.data.title}</h1>
+
+			{
+				note.data.tags.length > 0 && (
+					<div class="tags article-tags">
+						{note.data.tags.map((tag) => (
+							<a class="tag tag-link" href={withBase(`/notes?tag=${encodeURIComponent(tag)}`)}>
+								#{tag}
+							</a>
+						))}
+					</div>
+				)
+			}
+
+			<p class="article-standfirst">{note.data.description}</p>
 		</header>
-		<div class="prose">
-			<Content />
+
+		<div class:list={['article-layout', { 'has-toc': hasToc }]}>
+			<div class="prose article-prose">
+				<Content />
+			</div>
+			<TableOfContents headings={headings} />
 		</div>
 	</article>
+
+	{
+		linkedProject && (
+			<section class="related-block" aria-label="关联项目档案">
+				<p class="related-heading">LINKED PROJECT · 本文关联作品</p>
+				<div class="linked-project-card">
+					<div class="linked-project-main">
+						<div class="linked-project-top">
+							<span class="status-pill" data-tone={getStatusTone(linkedProject.data.status)}>
+								<span class="status-dot" aria-hidden="true" />
+								{linkedProject.data.status}
+							</span>
+							<div class="tags">
+								{linkedProject.data.stack.map((tech) => (
+									<span class="chip">{tech}</span>
+								))}
+							</div>
+						</div>
+						<h3>
+							<a href={withBase(`/projects/${linkedProject.id}`)}>{linkedProject.data.title}</a>
+						</h3>
+						<p>{linkedProject.data.summary}</p>
+					</div>
+					<div class="linked-project-actions">
+						<a class="btn-paper btn-sm" href={withBase(`/projects/${linkedProject.id}`)}>
+							查看作品档案 →
+						</a>
+						{projectLinks?.primary && (
+							<a
+								class="btn-ghost btn-sm"
+								href={projectLinks.primary.url}
+								target="_blank"
+								rel="noopener"
+							>
+								{projectLinks.primary.shortLabel} ↗
+							</a>
+						)}
+					</div>
+				</div>
+			</section>
+		)
+	}
+
+	{
+		(newer || older) && (
+			<nav class="entry-pager" aria-label="相邻笔记导航">
+				{newer ? (
+					<a class="pager-card" href={withBase(`/notes/${newer.id}`)}>
+						<span class="pager-label">← 更新一篇</span>
+						<strong>{newer.data.title}</strong>
+					</a>
+				) : (
+					<div />
+				)}
+				{older && (
+					<a class="pager-card is-next" href={withBase(`/notes/${older.id}`)}>
+						<span class="pager-label">更早一篇 →</span>
+						<strong>{older.data.title}</strong>
+					</a>
+				)}
+			</nav>
+		)
+	}
 </BaseLayout>

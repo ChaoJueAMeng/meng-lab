@@ -8,6 +8,7 @@ status: 公开仓库
 href: https://github.com/ChaoJueAMeng/NotiAsk
 readme: https://github.com/ChaoJueAMeng/NotiAsk/blob/main/README.md
 order: 2
+featured: true
 ---
 
 <div align="center">

@@ -1,14 +1,20 @@
 ---
-import { GITHUB_URL, SITE_AUTHOR } from '../consts';
-import ShinyLabel from './ShinyLabel';
+import { GITHUB_REPO, GITHUB_URL, SITE_AUTHOR } from '../consts';
+import { withBase } from '../lib/paths';
 ---
 
 <footer class="site-footer">
-	<div class="wrap">
-		<span>
-			© {new Date().getFullYear()}{' '}
-			<ShinyLabel client:visible text={SITE_AUTHOR} />
-		</span>
-		<a href={GITHUB_URL}>GitHub</a>
+	<div class="wrap footer-inner">
+		<div class="footer-meta">
+			<span class="footer-stamp">MENG-LAB</span>
+			<span>© {new Date().getFullYear()} {SITE_AUTHOR} · 把做过的事与翻过的车记下来</span>
+		</div>
+		<nav class="footer-links" aria-label="页脚链接">
+			<a href={withBase('/projects')}>作品</a>
+			<a href={withBase('/notes')}>笔记</a>
+			<a href={withBase('/about')}>关于</a>
+			<a href={GITHUB_URL} target="_blank" rel="noopener">GitHub ↗</a>
+			<a href={GITHUB_REPO} target="_blank" rel="noopener">源码 ↗</a>
+		</nav>
 	</div>
 </footer>

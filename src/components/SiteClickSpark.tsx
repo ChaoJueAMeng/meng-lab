@@ -26,10 +26,10 @@ export default function SiteClickSpark() {
 		<div className="site-spark-layer" aria-hidden="true">
 			<ClickSpark
 				sparkColor={theme === 'dark' ? '#e8a06a' : '#c45c26'}
-				sparkCount={9}
-				sparkSize={8}
-				sparkRadius={16}
-				duration={420}
+				sparkCount={6}
+				sparkSize={6}
+				sparkRadius={13}
+				duration={340}
 			/>
 		</div>
 	);

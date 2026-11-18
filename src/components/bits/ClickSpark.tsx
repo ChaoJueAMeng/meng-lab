@@ -20,10 +20,10 @@ interface Spark {
 
 const ClickSpark: React.FC<ClickSparkProps> = ({
 	sparkColor = '#fff',
-	sparkSize = 10,
-	sparkRadius = 15,
-	sparkCount = 8,
-	duration = 400,
+	sparkSize = 6,
+	sparkRadius = 12,
+	sparkCount = 6,
+	duration = 340,
 	easing = 'ease-out',
 	extraScale = 1.0,
 	children,
@@ -76,6 +76,8 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 
 		let animationId = 0;
 		let running = false;
+		let downX = 0;
+		let downY = 0;
 
 		const ease = (t: number) => {
 			switch (configRef.current.easing) {
@@ -109,11 +111,14 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 				const x2 = spark.x + (distance + lineLength) * Math.cos(spark.angle);
 				const y2 = spark.y + (distance + lineLength) * Math.sin(spark.angle);
 				ctx.strokeStyle = sparkColor;
-				ctx.lineWidth = 2;
+				ctx.globalAlpha = Math.max(0, 0.72 * (1 - progress));
+				ctx.lineWidth = 1.4;
+				ctx.lineCap = 'round';
 				ctx.beginPath();
 				ctx.moveTo(x1, y1);
 				ctx.lineTo(x2, y2);
 				ctx.stroke();
+				ctx.globalAlpha = 1;
 				return true;
 			});
 			if (sparksRef.current.length > 0) animationId = requestAnimationFrame(draw);
@@ -133,7 +138,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 			const newSparks: Spark[] = Array.from({ length: sparkCount }, (_, i) => ({
 				x: clientX - rect.left,
 				y: clientY - rect.top,
-				angle: (2 * Math.PI * i) / sparkCount,
+				angle: (2 * Math.PI * i) / sparkCount + Math.PI / 12,
 				startTime: now,
 			}));
 			sparksRef.current.push(...newSparks);
@@ -143,8 +148,19 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 		spawnRef.current = spawn;
 
 		const onPointerDown = (event: PointerEvent) => {
+			if (event.button !== 0) return;
+			downX = event.clientX;
+			downY = event.clientY;
+		};
+
+		const onClick = (event: MouseEvent) => {
+			if (event.detail === 0) return;
+			if (Math.hypot(event.clientX - downX, event.clientY - downY) > 6) return;
+			const selection = window.getSelection();
+			if (selection && selection.toString().length > 0) return;
 			spawn(event.clientX, event.clientY);
 		};
+
 		const onVis = () => {
 			if (document.hidden) {
 				running = false;
@@ -154,7 +170,8 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 			start();
 		};
 
-		document.addEventListener('pointerdown', onPointerDown);
+		document.addEventListener('pointerdown', onPointerDown, { passive: true });
+		document.addEventListener('click', onClick, { passive: true });
 		document.addEventListener('visibilitychange', onVis);
 		return () => {
 			cancelAnimationFrame(animationId);
@@ -162,6 +179,7 @@ const ClickSpark: React.FC<ClickSparkProps> = ({
 			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			spawnRef.current = () => {};
 			document.removeEventListener('pointerdown', onPointerDown);
+			document.removeEventListener('click', onClick);
 			document.removeEventListener('visibilitychange', onVis);
 		};
 	}, []);

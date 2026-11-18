@@ -1,0 +1,91 @@
+---
+import { GITHUB_URL } from '../consts';
+import { getNotes, getProjects } from '../lib/content';
+import { getGithubActivity } from '../lib/github';
+import { withBase } from '../lib/paths';
+import ClockCard from './widgets/ClockCard';
+
+const notes = await getNotes();
+const projects = await getProjects();
+const building = projects.find((project) => project.data.status.includes('实验')) ?? projects[0];
+const liveCount = projects.filter((project) => project.data.status.includes('上线')).length;
+const activity = await getGithubActivity();
+const dayLabels = ['6天前', '5天前', '4天前', '3天前', '前天', '昨天', '今天'];
+---
+
+<aside class="lab-desk" aria-label="实验台状态">
+	<div class="lab-desk-head">
+		<span class="lab-desk-kicker">LAB DESK · 实验台</span>
+		<ClockCard client:idle />
+	</div>
+
+	{
+		building && (
+			<a class="lab-desk-focus" href={withBase(`/projects/${building.id}`)}>
+				<div class="lab-focus-top">
+					<span class="lab-focus-label">
+						<span class="now-dot" aria-hidden="true" />
+						正在折腾
+					</span>
+					<span class="lab-focus-badge">{building.data.status}</span>
+				</div>
+				<strong class="lab-focus-title">
+					{building.data.title}
+					<span class="arrow-cue" aria-hidden="true">→</span>
+				</strong>
+				<p class="lab-focus-desc">{building.data.summary}</p>
+			</a>
+		)
+	}
+
+	<div class="lab-desk-stats" aria-label="实验室归档统计">
+		<a href={withBase('/projects')} class="lab-stat-item">
+			<span class="lab-stat-num">{projects.length}</span>
+			<span class="lab-stat-label">归档项目</span>
+		</a>
+		<a href={withBase('/projects?tag=已上线')} class="lab-stat-item">
+			<span class="lab-stat-num">{liveCount}</span>
+			<span class="lab-stat-label">线上运行</span>
+		</a>
+		<a href={withBase('/notes')} class="lab-stat-item">
+			<span class="lab-stat-num">{notes.length}</span>
+			<span class="lab-stat-label">工程手记</span>
+		</a>
+	</div>
+
+	<div class="lab-desk-activity">
+		<div class="lab-activity-head">
+			<span class="lab-activity-title">近 7 日公开提交</span>
+			<a href={GITHUB_URL} target="_blank" rel="noopener" class="lab-gh-link">
+				@ChaoJueAMeng ↗
+			</a>
+		</div>
+		<div class="activity-week" aria-hidden="true">
+			{
+				activity.week.map((count, idx) => (
+					<span
+						class:list={['activity-cell', { 'is-on': count > 0 }]}
+						style={`--n:${Math.min(count, 4)}`}
+						title={`${dayLabels[idx]}：${count} 次公开事件`}
+					/>
+				))
+			}
+		</div>
+		{
+			activity.ok ? (
+				<ul class="activity-list">
+					{activity.items.slice(0, 2).map((item) => (
+						<li>
+							<a href={item.href} target="_blank" rel="noopener">
+								{item.title}
+							</a>
+							<time>{item.meta}</time>
+						</li>
+					))}
+				</ul>
+			) : (
+				<p class="widget-fallback">构建时离线，点击右上角查看 GitHub 最新提交。</p>
+			)
+		}
+	</div>
+</aside>
